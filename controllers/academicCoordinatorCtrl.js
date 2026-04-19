@@ -43,8 +43,9 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
 //@acces Private Academic Coordinator Only
 exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
     console.log("ok");
-    
     const {
+        firstName,
+        lastName,
         phone,
         bio,
         address,
@@ -56,17 +57,15 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         linkedin,
         instagram
     } = req.body;
-    console.log("Country: ", country);
-    console.log("facebook: ", facebook);
-    console.log("Address:" , address);
-    
     const { id } = req.userAuth;
     const file = req.file;
-    let photo = "#";
-    if(file) {
-        photo = uploadImage(file);
+    let photo = undefined;
+    if (file) {
+        photo = await uploadImage(file);
     }
     const academicCoordinator = await AcademicCoordinator.findByIdAndUpdate(id, {
+        firstName,
+        lastName,
         phone,
         bio,
         address,
@@ -81,7 +80,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
     }, {
         new: true
     });
-    res.send(200).json({
+    res.status(200).json({
         status: "success",
         message: "Academic coordinator profile updated successfully",
         data: academicCoordinator,
@@ -154,7 +153,7 @@ exports.getUniversityCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const university = await University.findOne({ academicCoordinator: id });
     res.status(200).json({
-        status: "success", 
+        status: "success",
         message: "Academic supervisor registered successfully",
         data: university,
     })
