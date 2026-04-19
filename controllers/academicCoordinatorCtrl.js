@@ -42,28 +42,37 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/academic-coordinators/profile
 //@acces Private Academic Coordinator Only
 exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
+    console.log("ok");
+    
     const {
         phone,
         bio,
         address,
         city,
         country,
-        postalcode,
+        postalCode,
         facebook,
         x,
         linkedin,
         instagram
     } = req.body;
+    console.log("Country: ", country);
+    console.log("facebook: ", facebook);
+    console.log("Address:" , address);
+    
     const { id } = req.userAuth;
     const file = req.file;
-    const photo = uploadImage(file);
-    const academicCoordinator = await AcademicCoordinator.findOneAndUpdate(id, {
+    let photo = "#";
+    if(file) {
+        photo = uploadImage(file);
+    }
+    const academicCoordinator = await AcademicCoordinator.findByIdAndUpdate(id, {
         phone,
         bio,
         address,
         city,
         country,
-        postalcode,
+        postalCode,
         facebook,
         x,
         linkedin,
