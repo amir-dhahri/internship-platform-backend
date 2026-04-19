@@ -55,6 +55,8 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         instagram
     } = req.body;
     const { id } = req.userAuth;
+    const file = req.file;
+    const photo = uploadImage(file);
     const academicCoordinator = await AcademicCoordinator.findOneAndUpdate(id, {
         phone,
         bio,
@@ -65,7 +67,8 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         facebook,
         x,
         linkedin,
-        instagram
+        instagram,
+        photo
     }, {
         new: true
     });

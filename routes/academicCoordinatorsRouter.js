@@ -16,7 +16,7 @@ academicCoordinatorRouter.post("/register", registerAcademicCoordinatorCtrl);
 academicCoordinatorRouter.post("/login", loginAcademicCoordinatorCtrl);
 
 //Update academic coordinator profile
-academicCoordinatorRouter.put("/profile", isLogin, isAcademicCoordinator, updateAcademicCoordinatorProfileCtrl)
+academicCoordinatorRouter.put("/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicCoordinatorProfileCtrl)
 
 // Get academic Coordinator Profile
 academicCoordinatorRouter.get("/profile", isLogin, isAcademicCoordinator, getAcademicCoordinatorProfileCtrl);
