@@ -8,7 +8,7 @@ const academicYearSchema = new Schema(
             type: String,
             required: true,
         },
-        departmentId: {
+        academicLevelId: {
             type: Schema.Types.ObjectId,
             ref: "AcademicLevel",
             required: true

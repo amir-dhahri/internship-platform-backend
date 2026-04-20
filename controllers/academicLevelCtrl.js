@@ -9,6 +9,9 @@ exports.createAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         name,
         departmentId
     } = req.body;
+    
+    const {id} = req.userAuth;
+
     const academicLevelFound = await AcademicLevel.findOne({ name, departmentId });
     if (academicLevelFound) {
         throw new Error("Academic level already exists");
@@ -20,6 +23,26 @@ exports.createAcademicLevelCtrl = AsyncHandler(async (req, res) => {
             departmentId
         }
     )
+
+    const receivers = [id]
+    
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Levels",
+        message: `New academic level "${name}" was created`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(201).json({
         status: "success",
         message: "Academic level added successfully",
