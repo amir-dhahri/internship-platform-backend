@@ -2,6 +2,7 @@ const AsyncHandler = require("express-async-handler");
 const Department = require("../models/Department");
 const AcademicLevel = require("../models/AcademicLevel");
 const University = require("../models/University");
+const AcademicCoordinator = require("../models/AcademicCoordinator");
 
 
 //@desc Add department
@@ -19,7 +20,6 @@ exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
     if (departmentFound) {
         throw new Error("Department already exists");
     }
-    
     const department = await Department.create(
         {
             name,
@@ -28,6 +28,27 @@ exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
             university: university._id
         }
     )
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: Department,
+        message: `New department "${name}" was created`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(201).json({
         status: "success",
         message: "Department added successfully",

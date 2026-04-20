@@ -30,6 +30,5 @@ academicCoordinatorRouter.post("/register/academic-supervisor", isLogin, isAcade
 // Register University
 academicCoordinatorRouter.post("/register/university", isLogin, isAcademicCoordinator, upload.single("file"), registerUniversityCtrl)
 
-//Create Notification
-academicCoordinatorRouter.post("/notifications", isLogin, isAcademicCoordinator, createNotificationCtrl);
+
 module.exports = academicCoordinatorRouter; 
