@@ -1,8 +1,9 @@
 require("dotenv").config()
 const http = require("http")
 const app = require("./app/app");
-const cors = require("cors");
+// const cors = require("cors");
 const { Server } = require("socket.io");
+const socketIoAuth = require("./middlewares/socketioAuth");
 require("./config/dbConnect");
 const PORT = process.env.PORT || 2026;
 
@@ -18,6 +19,7 @@ const io = new Server(server, {
         credentials: true,
     },
 });
+io.use(socketIoAuth);
 // make io accessible in controllers
 app.set("io", io);
 
@@ -25,11 +27,15 @@ app.set("io", io);
 io.on("connection", (socket) => {
     console.log("Client connected:", socket.id);
 
-    // join user room
-    const userId = socket.handshake.query.userId;
-    if (userId) {
-        socket.join(userId);
-    }
+    const userId = socket.user.id;
+
+    socket.join(userId);
+
+    console.log("User joined room:", userId);
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected:", socket.id);
+    });
 
     // // optional: keep this ONLY if you want direct socket triggering
     // socket.on("sendNotification", async (data) => {
@@ -41,10 +47,6 @@ io.on("connection", (socket) => {
     //         console.log("Socket error:", error);
     //     }
     // });
-
-    socket.on("disconnect", () => {
-        console.log("Client disconnected:", socket.id);
-    });
 });
 
 
