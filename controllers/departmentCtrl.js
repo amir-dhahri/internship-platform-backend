@@ -30,9 +30,9 @@ exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
         }
     )
     const academicCoordinator = await AcademicCoordinator.findById(id);
-    
+
     const receivers = [id]
-    
+
     const notif = await Notification.create({
         sender: id,
         receivers,
@@ -164,8 +164,9 @@ exports.updateDepartmentCtrl = AsyncHandler(async (req, res) => {
         description,
         isActive, } = req.body;
     const { id } = req.params;
+    const { id: userId } = req.userAuth;
     // If name exists
-    const university = await University.findOne({ academicCoordinator: req.userAuth.id });
+    const university = await University.findOne({ academicCoordinator: userId });
     const departmentExists = await Department.findOne({ name, _id: { $ne: id }, university: university._id });
     if (departmentExists) {
         throw new Error("Department already exists");
@@ -178,6 +179,26 @@ exports.updateDepartmentCtrl = AsyncHandler(async (req, res) => {
         }, {
         new: true,
     });
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Departments",
+        message: `New department "${name}" was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(200).json({
         status: "success",
         message: "Department updated successfully",
@@ -190,7 +211,30 @@ exports.updateDepartmentCtrl = AsyncHandler(async (req, res) => {
 //@access Private University Coordinator Only
 exports.deleteDepartmentCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
-    await Department.findByIdAndDelete(id);
+    const {name} = await Department.findByIdAndDelete(id);
+
+    const {id: userId} = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Departments",
+        message: `New department "${name}" was deleted`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
 
     res.status(200).json({
         status: "success",
