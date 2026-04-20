@@ -2,7 +2,7 @@ const express = require("express");
 const { getAcademicLevelsCtrl, createAcademicLevelCtrl, updateAcademicLevelCtrl, deleteAcademicLevelCtrl, getAcademicLevelCtrl } = require("../controllers/academicLevelCtrl");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
-const { getAcademicLevelAcademicYearsCtrl } = require("../controllers/academicYearCtrl");
+const { getAcademicLevelAcademicYearsCtrl } = require("../controllers/academicLevelCtrl");
 
 
 const acdemicLevelRouter = express.Router();

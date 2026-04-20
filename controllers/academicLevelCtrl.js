@@ -1,5 +1,7 @@
 const AsyncHandler = require("express-async-handler");
 const AcademicLevel = require("../models/AcademicLevel");
+const { default: Notification } = require("../models/Notification");
+const AcademicCoordinator = require("../models/AcademicCoordinator");
 
 //@desc Add academic level
 //@route POST /api/v1/academic-levels
@@ -9,21 +11,23 @@ exports.createAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         name,
         departmentId
     } = req.body;
-    
-    const {id} = req.userAuth;
 
+    
     const academicLevelFound = await AcademicLevel.findOne({ name, departmentId });
     if (academicLevelFound) {
         throw new Error("Academic level already exists");
     }
-
+    
     const academicLevel = await AcademicLevel.create(
         {
             name,
             departmentId
         }
     )
+    const {id} = req.userAuth;
 
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+    
     const receivers = [id]
     
     const notif = await Notification.create({
@@ -99,6 +103,28 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         }, {
         new: true,
     });
+    const {id: userId} = req.userAuth;
+    
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+    
+    const receivers = [userId]
+    
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Levels",
+        message: `New academic level "${name}" was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
     res.status(200).json({
         status: "success",
         message: "Academic level updated successfully",
@@ -111,11 +137,49 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
 //@access Private University Coordinator Only
 exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
-    await AcademicLevel.findByIdAndDelete(id);
 
+    const {name} = await AcademicLevel.findByIdAndDelete(id);
+    
+    const {id: userId} = req.userAuth;
+    
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+    
+    const receivers = [userId]
+    
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Levels",
+        message: `New academic level "${name}" was deleted`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
     res.status(200).json({
         status: "success",
         message: "Academic level deleted successfully",
         data: {},
     });
+})
+
+//@desc Get Academic level's academic years
+//@route GET /api/v1/departments/:id/academic-years/
+//@access Private University Coordinator Only
+exports.getAcademicLevelAcademicYearsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const academicYears = await AcademicYear.find({ academicLevelId: id });
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Academic years fetched successfully",
+            data: academicYears,
+        }
+    );
 })

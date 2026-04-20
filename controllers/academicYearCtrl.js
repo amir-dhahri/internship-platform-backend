@@ -1,6 +1,8 @@
 const AsyncHandler = require("express-async-handler");
 const AcademicLevel = require("../models/AcademicLevel");
 const AcademicYear = require("../models/AcademicYear");
+const AcademicCoordinator = require("../models/AcademicCoordinator");
+const { default: Notification } = require("../models/Notification");
 
 //@desc Add academic year
 //@route POST /api/v1/academic-years
@@ -11,7 +13,6 @@ exports.createAcademicYearCtrl = AsyncHandler(async (req, res) => {
         academicLevelId
     } = req.body;
 
-    const {id} = req.userAuth;
 
     const academicLevelFound = await AcademicLevel.findOne({ name, academicLevelId });
     if (academicLevelFound) {
@@ -25,10 +26,14 @@ exports.createAcademicYearCtrl = AsyncHandler(async (req, res) => {
         }
     )
 
-    const receivers = [id]
+    const { id: userId } = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
 
     const notif = await Notification.create({
-        sender: id,
+        sender: userId,
         receivers,
         type: "SYSTEM",
         entity: name,
@@ -100,6 +105,30 @@ exports.updateAcademicYearCtrl = AsyncHandler(async (req, res) => {
         }, {
         new: true,
     });
+
+    const { id: userId } = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Years",
+        message: `New academic year "${name}" was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(200).json({
         status: "success",
         message: "Academic year updated successfully",
@@ -112,7 +141,30 @@ exports.updateAcademicYearCtrl = AsyncHandler(async (req, res) => {
 //@access Private University Coordinator Only
 exports.deleteAcademicYearCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
-    await AcademicYear.findByIdAndDelete(id);
+    const { name } = await AcademicYear.findByIdAndDelete(id);
+
+    const { id: userId } = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Years",
+        message: `New academic year "${name}" was deleted`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
 
     res.status(200).json({
         status: "success",
@@ -121,17 +173,3 @@ exports.deleteAcademicYearCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
-//@desc Get Academic level's academic years
-//@route GET /api/v1/departments/:id/academic-years/
-//@access Private University Coordinator Only
-exports.getAcademicLevelAcademicYearsCtrl = AsyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const academicYears = await AcademicYear.find({ academicLevelId: id });
-    res.status(200).json(
-        {
-            status: "success",
-            message: "Academic years fetched successfully",
-            data: academicYears,
-        }
-    );
-})
