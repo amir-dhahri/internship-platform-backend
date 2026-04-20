@@ -203,7 +203,7 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
             password: await hashPassword(password),
         }
     )
-    
+
     const {id} = req.userAuth;
 
     const academicCoordinator = await AcademicCoordinator.findById(id);
@@ -214,9 +214,9 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
         sender: id,
         receivers,
         type: "SYSTEM",
-        entity: name,
+        entity: `${firstName} ${lastName}`,
         entityType: "Academic Supervisors",
-        message: `New academic supervisor "${name}" was rehistered`,
+        message: `New academic supervisor "${firstName} ${lastName}" was rehistered`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
@@ -225,6 +225,7 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     receivers.forEach((receiverId) => {
         io.to(receiverId.toString()).emit("receiveNotification", notif)
     })
+    
     res.status(201).json({
         status: "success",
         message: "Academic supervisor registered successfully",
