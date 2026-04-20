@@ -2,86 +2,110 @@ const AsyncHandler = require("express-async-handler");
 const AcademicLevel = require("../models/AcademicLevel");
 const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
-const AcademicYear = require("../models/AcademicYear");
+const AcademicSupervisor = require("../models/AcademicSupervisor");
 
-//@desc Add academic level
-//@route POST /api/v1/academic-levels
-//@access Private University Coordinator Only
-exports.createAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+//@desc Register academic supervisor
+//@route POST /api/v1/academic-supervisors/
+//@access Private Academic Coordinator Only
+exports.createAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const {
-        name,
-        departmentId
+        firstName,
+        lastName,
+        email,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalcode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        password
     } = req.body;
-
-    
-    const academicLevelFound = await AcademicLevel.findOne({ name, departmentId });
-    if (academicLevelFound) {
-        throw new Error("Academic level already exists");
+    const academicSupervisorFound = await AcademicSupervisor.findOne({ email });
+    if (academicSupervisorFound) {
+        throw new Error("Academic supervisor already exists");
     }
-    
-    const academicLevel = await AcademicLevel.create(
+    const file = req.file;
+    const photo = await uploadImage(file)
+    const academicSupervisor = await AcademicSupervisor.create(
         {
-            name,
-            departmentId
+            firstName,
+            lastName,
+            email,
+            phone,
+            bio,
+            address,
+            city,
+            country,
+            postalcode,
+            facebook,
+            x,
+            linkedin,
+            instagram,
+            photo,
+            password: await hashPassword(password),
         }
     )
+
     const {id} = req.userAuth;
 
     const academicCoordinator = await AcademicCoordinator.findById(id);
-    
+
     const receivers = [id]
-    
+
     const notif = await Notification.create({
         sender: id,
         receivers,
         type: "SYSTEM",
-        entity: name,
-        entityType: "Academic Levels",
-        message: `New academic level "${name}" was created`,
+        entity: `${firstName} ${lastName}`,
+        entityType: "Academic Supervisors",
+        message: `New academic supervisor "${firstName} ${lastName}" was registered`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
-
     const io = req.app.get("io");
 
     receivers.forEach((receiverId) => {
         io.to(receiverId.toString()).emit("receiveNotification", notif)
     })
-
+    
     res.status(201).json({
         status: "success",
-        message: "Academic level added successfully",
-        data: academicLevel,
+        message: "Academic supervisor registered successfully",
+        data: academicSupervisor,
     })
 })
 
-//@desc Get all academic levels
-//@route GET /api/v1/academic-levels
+//@desc Get all academic supervisors
+//@route GET /api/v1/academic-supervisors
 //@access Private University Coordinator Only
-exports.getAcademicLevelsCtrl = AsyncHandler(async (req, res) => {
-    const academicLevels = await AcademicLevel.find();
+exports.getAcademicSupervisorsCtrl = AsyncHandler(async (req, res) => {
+    const academicSupervisors = await AcademicSupervisor.find();
     res.status(200).json(
         {
             status: "success",
-            message: "Academic levels fetched successfully",
-            data: academicLevels,
+            message: "Academic supervisors fetched successfully",
+            data: academicSupervisors,
         }
     );
 })
 
-//@desc Get academic level
-//@route GET /api/v1/academic-levels/:id
+//@desc Get academic supervisor
+//@route GET /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
-exports.getAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const academicLevel = await AcademicLevel.findById(id);
-    if (!academicLevel) {
-        throw new Error("Academic level Not Found!");
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+    if (!academicSupervisor) {
+        throw new Error("Academic superivor Not Found!");
     }
     res.status(200).json({
         status: "success",
-        message: "Academic level fetched successfully",
-        data: academicLevel,
+        message: "Academic superivor fetched successfully",
+        data: academicSupervisor,
     });
 })
 

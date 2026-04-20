@@ -24,9 +24,6 @@ academicCoordinatorRouter.get("/profile", isLogin, isAcademicCoordinator, getAca
 // Get University
 academicCoordinatorRouter.get("/university", isLogin, isAcademicCoordinator, getUniversityCtrl);
 
-// Register Academic Supervisor
-academicCoordinatorRouter.post("/register/academic-supervisor", isLogin, isAcademicCoordinator, upload.single("file"), registerAcademicSupervisorCtrl)
-
 // Register University
 academicCoordinatorRouter.post("/register/university", isLogin, isAcademicCoordinator, upload.single("file"), registerUniversityCtrl)
 
@@ -34,3 +31,6 @@ academicCoordinatorRouter.post("/register/university", isLogin, isAcademicCoordi
 academicCoordinatorRouter.get("/notifications", isLogin, isAcademicCoordinator, getNotificationsCtrl)
 
 module.exports = academicCoordinatorRouter; 
+
+
+

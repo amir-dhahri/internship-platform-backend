@@ -54,6 +54,11 @@ const academicSupervisorSchema = new Schema(
         instagram: {
             type: String,
         },
+        academicYear: [
+            {
+                type: 
+            }
+        ],
         role: {
             type: String,
             default: "academic-supervisor"
