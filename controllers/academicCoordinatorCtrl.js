@@ -253,3 +253,18 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
         data: university,
     })
 })
+
+//@desc Get all notifications 
+//@route GET /api/v1/academic-coordinators/notifications
+//@access  Private Academic Coordinator Only
+exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const notifications = await Notification.find({
+        receivers: { $in: id }
+    });
+    res.status(200).send({
+        status: "success",
+        message: "Notifications fetched successfully",
+        data: notifications
+    })
+})

@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { registerAcademicSupervisorCtrl, registerUniversityCtrl, getUniversityCtrl, registerAcademicCoordinatorCtrl, loginAcademicCoordinatorCtrl, getAcademicCoordinatorProfileCtrl, updateAcademicCoordinatorProfileCtrl, createNotificationCtrl } = require("../controllers/academicCoordinatorCtrl");
+const { registerAcademicSupervisorCtrl, registerUniversityCtrl, getUniversityCtrl, registerAcademicCoordinatorCtrl, loginAcademicCoordinatorCtrl, getAcademicCoordinatorProfileCtrl, updateAcademicCoordinatorProfileCtrl, createNotificationCtrl, getNotificationsCtrl } = require("../controllers/academicCoordinatorCtrl");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 
@@ -30,5 +30,7 @@ academicCoordinatorRouter.post("/register/academic-supervisor", isLogin, isAcade
 // Register University
 academicCoordinatorRouter.post("/register/university", isLogin, isAcademicCoordinator, upload.single("file"), registerUniversityCtrl)
 
+// Get All Notifications
+academicCoordinatorRouter.get("/notifications", isLogin, isAcademicCoordinator, getNotificationsCtrl)
 
 module.exports = academicCoordinatorRouter; 
