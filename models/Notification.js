@@ -4,18 +4,14 @@ const notificationSchema = new mongoose.Schema(
     {
         sender: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User", // who triggered the notification
             required: true,
         },
-
         receivers: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "User", // who will receive it
                 required: true,
             }
         ],
-
         type: {
             type: String,
             enum: ["PROJECT_COMPLETED", "MESSAGE", "SYSTEM"],

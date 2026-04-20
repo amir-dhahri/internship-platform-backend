@@ -3,6 +3,7 @@ const Department = require("../models/Department");
 const AcademicLevel = require("../models/AcademicLevel");
 const University = require("../models/University");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
+const { default: Notification } = require("../models/Notification");
 
 
 //@desc Add department
@@ -29,20 +30,19 @@ exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
         }
     )
     const academicCoordinator = await AcademicCoordinator.findById(id);
-
+    
     const receivers = [id]
-
+    
     const notif = await Notification.create({
         sender: id,
         receivers,
         type: "SYSTEM",
         entity: name,
-        entityType: Department,
+        entityType: "Departments",
         message: `New department "${name}" was created`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
-
     const io = req.app.get("io");
 
     receivers.forEach((receiverId) => {
