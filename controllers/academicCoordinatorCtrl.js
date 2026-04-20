@@ -203,6 +203,28 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
             password: await hashPassword(password),
         }
     )
+    
+    const {id} = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Supervisors",
+        message: `New academic supervisor "${name}" was rehistered`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
     res.status(201).json({
         status: "success",
         message: "Academic supervisor registered successfully",
@@ -247,6 +269,27 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
             academicCoordinator: id
         }
     )
+
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "University",
+        message: `New university "${name}" was registered`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(201).json({
         status: "success",
         message: "University registered successfully",
