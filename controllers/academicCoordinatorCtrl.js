@@ -5,6 +5,7 @@ const University = require("../models/University");
 const { uploadImage } = require("../utils/cloudinary");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const generateToken = require("../utils/generateToken");
+const { default: Notification } = require("../models/Notification");
 
 
 //@desc Register academic coordinator
@@ -42,7 +43,6 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/academic-coordinators/profile
 //@acces Private Academic Coordinator Only
 exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
-    console.log("ok");
     const {
         firstName,
         lastName,
@@ -251,5 +251,44 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
         status: "success",
         message: "University registered successfully",
         data: university,
+    })
+})
+
+//@desc Add notification
+//@route POST /api/v1/academic-coordinators/notifications
+//@access Private Academic Coordinator Only
+exports.createNotificationCtrl = AsyncHandler(async (req, res) => {
+    const {
+        reveivers,
+        type,
+        entity,
+        entityType,
+        message,
+        isRead
+    } = req.body;
+    const { id } = req.userAuth;
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+    if(reveivers.length == 0) {
+        reveivers.push(id);
+    }
+    const notifications = [];
+    for (const receiver of data.receivers) {
+        const notif = await Notification.create({
+            sender: id,
+            reveivers,
+            type,
+            entity,
+            entityType,
+            message,
+            isRead,
+            senderPhoto: academicCoordinator.photo
+        });
+        notifications.push(notif);
+        req.app.get("io").to(receiver.toString()).emit("receiveNotification", notif)
+    }
+    return res.status(201).json({
+        status: "success",
+        message: "Notification created successfully!",
+        data: notifications,
     })
 })
