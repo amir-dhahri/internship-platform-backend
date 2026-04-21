@@ -7,7 +7,7 @@ const AcademicSupervisor = require("../models/AcademicSupervisor");
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
 //@access Private Academic Coordinator Only
-exports.createAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
+exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,
         lastName,
@@ -50,7 +50,7 @@ exports.createAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
         }
     )
 
-    const {id} = req.userAuth;
+    const { id } = req.userAuth;
 
     const academicCoordinator = await AcademicCoordinator.findById(id);
 
@@ -71,7 +71,7 @@ exports.createAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     receivers.forEach((receiverId) => {
         io.to(receiverId.toString()).emit("receiveNotification", notif)
     })
-    
+
     res.status(201).json({
         status: "success",
         message: "Academic supervisor registered successfully",
@@ -109,51 +109,74 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
-//@desc Update academic level
-//@route PUT /api/v1/academic-levels/:id
+//@desc Update academic supervisor
+//@route PUT /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
 exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
-
-    const { name, departmentId } = req.body;
-    const { id } = req.params;
-    // If name exists
-
-    const academicLevelExists = await AcademicLevel.findOne({ name, departmentId, _id: { $ne: id } });
-    if (academicLevelExists) {
-        throw new Error("Academic level already exists");
+    const {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram
+    } = req.body;
+    const {id} = req.params;
+    const file = req.file;
+    let photo = undefined;
+    if (file) {
+        photo = await uploadImage(file);
     }
-    const academicLevel = await AcademicLevel.findByIdAndUpdate(id,
-        {
-            name,
-        }, {
-        new: true,
+    const academicSupervisor = await AcademicSupervisor.findByIdAndUpdate(id, {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        photo
+    }, {
+        new: true
     });
-    const {id: userId} = req.userAuth;
-    
+
+    const { id: userId } = req.userAuth;
+
     const academicCoordinator = await AcademicCoordinator.findById(userId);
-    
+
     const receivers = [userId]
-    
+
     const notif = await Notification.create({
         sender: userId,
         receivers,
         type: "SYSTEM",
-        entity: name,
-        entityType: "Academic Levels",
-        message: `New academic level "${name}" was updated`,
+        entity: `${firstName} ${lastName}`,
+        entityType: "Academic Supervisors",
+        message: `Academic supervisor "${firstName} ${lastName}" profile was updated`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
-
     const io = req.app.get("io");
 
     receivers.forEach((receiverId) => {
         io.to(receiverId.toString()).emit("receiveNotification", notif)
     })
+
     res.status(200).json({
         status: "success",
-        message: "Academic level updated successfully",
-        data: academicLevel
+        message: "Academic supervisor profile updated successfully",
+        data: academicSupervisor,
     })
 })
 
@@ -163,14 +186,14 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
 exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const {name} = await AcademicLevel.findByIdAndDelete(id);
-    
-    const {id: userId} = req.userAuth;
-    
+    const { name } = await AcademicLevel.findByIdAndDelete(id);
+
+    const { id: userId } = req.userAuth;
+
     const academicCoordinator = await AcademicCoordinator.findById(userId);
-    
+
     const receivers = [userId]
-    
+
     const notif = await Notification.create({
         sender: userId,
         receivers,
@@ -194,17 +217,9 @@ exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
-//@desc Get Academic level's academic years
-//@route GET /api/v1/academic-levels/:id/academic-years/
+//@desc Delete academic level
+//@route DELETE /api/v1/academic-levels/:id
 //@access Private University Coordinator Only
-exports.getAcademicLevelAcademicYearsCtrl = AsyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const academicYears = await AcademicYear.find({ academicLevelId: id });
-    res.status(200).json(
-        {
-            status: "success",
-            message: "Academic years fetched successfully",
-            data: academicYears,
-        }
-    );
+exports.addAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+
 })

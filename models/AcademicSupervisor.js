@@ -54,9 +54,11 @@ const academicSupervisorSchema = new Schema(
         instagram: {
             type: String,
         },
-        academicYear: [
+        academicYears: [
             {
-                type: 
+                type: Schema.Types.ObjectId,
+                ref: "AcademicYear",
+                required: false
             }
         ],
         role: {

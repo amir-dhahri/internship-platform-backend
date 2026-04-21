@@ -47,6 +47,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         firstName,
         lastName,
         phone,
+        email,
         bio,
         address,
         city,
@@ -58,6 +59,10 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         instagram
     } = req.body;
     const { id } = req.userAuth;
+    const academicCoordinatorFound = await AcademicCoordinator.findOne({ email, _id: { $ne: id } });
+    if (academicCoordinatorFound) {
+        throw new Error("Academic coordinator credentials already exist")
+    }
     const file = req.file;
     let photo = undefined;
     if (file) {
@@ -70,6 +75,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         bio,
         address,
         city,
+        email,
         country,
         postalCode,
         facebook,
@@ -80,6 +86,25 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
     }, {
         new: true
     });
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: `${firstName} ${lastName}`,
+        entityType: "Academic Coordinators",
+        message: `Academic coordinator "${firstName} ${lastName}" profile was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(200).json({
         status: "success",
         message: "Academic coordinator profile updated successfully",
