@@ -110,10 +110,10 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
-//@desc Update academic supervisor
-//@route PUT /api/v1/academic-supervisors/:id
+//@desc Update academic supervisor profile
+//@route PUT /api/v1/academic-supervisors/:id/profile
 //@access Private University Coordinator Only
-exports.updateAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
+exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,
         lastName,
@@ -232,10 +232,11 @@ exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 })
 
 //@desc Assign academic year
-//@route POST /api/v1/academic-supervisors/:supervisorId/academic-years/:academicYearId
+//@route POST /api/v1/academic-supervisors/:id/academic-years
 //@access Private University Coordinator Only
 exports.assignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
-    const {supervisorId, academicYearId} = req.params;
+    const {id: supervisorId} = req.params;
+    const { academicYearId} = req.body;
     const academicSupervisor = await AcademicSupervisor.findById(supervisorId);
     if(!academicSupervisor) {
         throw new Error("Academic supervisor not found");
