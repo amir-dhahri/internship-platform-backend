@@ -3,6 +3,7 @@ const AcademicLevel = require("../models/AcademicLevel");
 const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
+const AcademicYear = require("../models/AcademicYear");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -230,9 +231,51 @@ exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
-//@desc Delete academic level
-//@route DELETE /api/v1/academic-levels/:id
+//@desc Assign academic year
+//@route POST /api/v1/academic-supervisors/:supervisorId/academic-years/:academicYearId
 //@access Private University Coordinator Only
-exports.addAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+exports.assignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
+    const {supervisorId, academicYearId} = req.params;
+    const academicSupervisor = await AcademicSupervisor.findById(supervisorId);
+    if(!academicSupervisor) {
+        throw new Error("Academic supervisor not found");
+    }
+    if(academicSupervisor.academicYears.includes(academicYearId)) {
+        throw new Error("Academic year already assigned");
+    }
+    academicSupervisor.academicYears.push(academicYearId);
+    await academicSupervisor.save();
 
+    const academicYear = await AcademicYear.findById(academicYearId);
+
+    const name = `${academicSupervisor.firstName} ${academicSupervisor.lastName}`
+
+    const { id: userId } = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Academic Supervisors",
+        message: `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}."`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Academic year assigned successfully",
+        data: academicSupervisor
+    });
 })

@@ -263,7 +263,7 @@ exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const notifications = await Notification.find({
         receivers: { $in: id }
-    });
+    }).sort({createdAT: -1});
     res.status(200).send({
         status: "success",
         message: "Notifications fetched successfully",
