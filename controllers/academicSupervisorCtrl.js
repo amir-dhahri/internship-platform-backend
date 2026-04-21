@@ -4,6 +4,7 @@ const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
 const AcademicYear = require("../models/AcademicYear");
+const { hashPassword } = require("../utils/helpers");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -13,40 +14,20 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
         firstName,
         lastName,
         email,
-        phone,
-        bio,
-        address,
-        city,
-        country,
-        postalcode,
-        facebook,
-        x,
-        linkedin,
-        instagram,
         password
     } = req.body;
+
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email });
+
     if (academicSupervisorFound) {
         throw new Error("Academic supervisor already exists");
     }
-    const file = req.file;
-    const photo = await uploadImage(file)
+
     const academicSupervisor = await AcademicSupervisor.create(
         {
             firstName,
             lastName,
             email,
-            phone,
-            bio,
-            address,
-            city,
-            country,
-            postalcode,
-            facebook,
-            x,
-            linkedin,
-            instagram,
-            photo,
             password: await hashPassword(password),
         }
     )
@@ -84,7 +65,7 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 //@route GET /api/v1/academic-supervisors/
 //@access Private University Coordinator Only
 exports.getAcademicSupervisorsCtrl = AsyncHandler(async (req, res) => {
-    const academicSupervisors = await AcademicSupervisor.find();
+    const academicSupervisors = await AcademicSupervisor.find().select("-password");
     res.status(200).json(
         {
             status: "success",
@@ -100,6 +81,22 @@ exports.getAcademicSupervisorsCtrl = AsyncHandler(async (req, res) => {
 exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
     const academicSupervisor = await AcademicSupervisor.findById(id);
+    if (!academicSupervisor) {
+        throw new Error("Academic superivor Not Found!");
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Academic superivor fetched successfully",
+        data: academicSupervisor,
+    });
+})
+
+//@desc Get academic supervisor profile
+//@route GET /api/v1/academic-supervisors/:id/profile
+//@access Private University Coordinator Only
+exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const academicSupervisor = await AcademicSupervisor.findById(id).select("-password");
     if (!academicSupervisor) {
         throw new Error("Academic superivor Not Found!");
     }
@@ -128,7 +125,7 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
         linkedin,
         instagram
     } = req.body;
-    const {id} = req.params;
+    const { id } = req.params;
 
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email, _id: { $ne: id } });
     if (academicSupervisorFound) {
@@ -198,7 +195,7 @@ exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
 
     const { firstName, lastName } = await AcademicSupervisor.findByIdAndDelete(id);
-    
+
     const name = `${firstName} ${lastName}`
 
     const { id: userId } = req.userAuth;
@@ -235,13 +232,13 @@ exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/:id/academic-years
 //@access Private University Coordinator Only
 exports.assignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
-    const {id: supervisorId} = req.params;
-    const { academicYearId} = req.body;
+    const { id: supervisorId } = req.params;
+    const { academicYearId } = req.body;
     const academicSupervisor = await AcademicSupervisor.findById(supervisorId);
-    if(!academicSupervisor) {
+    if (!academicSupervisor) {
         throw new Error("Academic supervisor not found");
     }
-    if(academicSupervisor.academicYears.includes(academicYearId)) {
+    if (academicSupervisor.academicYears.includes(academicYearId)) {
         throw new Error("Academic year already assigned");
     }
     academicSupervisor.academicYears.push(academicYearId);

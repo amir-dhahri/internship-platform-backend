@@ -18,15 +18,17 @@ academicSupervisorsRouter.get("/", isLogin, isAcademicCoordinator, getAcademicSu
 // Get Academic Supervisor
 academicSupervisorsRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
 
-// Update Academic Supervisor profile
+// Update Academic Supervisor Profile
 academicSupervisorsRouter.put("/:id/profile", isLogin, isAcademicCoordinator, updateAcademicSupervisorProfileCtrl);
+
+// Get Academic Supervisor Profile
+academicSupervisorsRouter.get("/:id/profile", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
 
 // Delete Academic Supervisor 
 academicSupervisorsRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteAcademicSupervisorCtrl);
 
 // Update Academic Supervisor profile
 academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, assignAcademicYearToSupervisorCtrl);
-
 
 module.exports = academicSupervisorsRouter;
 

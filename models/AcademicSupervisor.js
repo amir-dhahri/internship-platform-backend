@@ -24,35 +24,48 @@ const academicSupervisorSchema = new Schema(
             type: String,
             required: true,
         },
+        bio: {
+            type: String,
+            default: "#"
+        },
         phone: {
-            type: String
+            type: String,
+            default: "#"
         },
         photo: {
             type: String
         },
         address: {
-            type: String
+            type: String,
+            default: "#"
         },
         city: {
-            type: String
+            type: String,
+            default: "#"
         },
         country: {
             type: String,
+            default: "#"
         },
         postalCode: {
             type: Number,
+            default: "#"
         },
         facebook: {
             type: String,
+            default: "#"
         },
         x: {
-            type: String
+            type: String,
+            default: "#"
         },
         linkedin: {
             type: String,
+            default: "#"
         },
         instagram: {
             type: String,
+            default: "#"
         },
         academicYears: [
             {
