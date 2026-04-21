@@ -80,7 +80,7 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 })
 
 //@desc Get all academic supervisors
-//@route GET /api/v1/academic-supervisors
+//@route GET /api/v1/academic-supervisors/
 //@access Private University Coordinator Only
 exports.getAcademicSupervisorsCtrl = AsyncHandler(async (req, res) => {
     const academicSupervisors = await AcademicSupervisor.find();
@@ -112,7 +112,7 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 //@desc Update academic supervisor
 //@route PUT /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
-exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+exports.updateAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,
         lastName,
@@ -128,11 +128,18 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         instagram
     } = req.body;
     const {id} = req.params;
+
+    const academicSupervisorFound = await AcademicSupervisor.findOne({ email, _id: { $ne: id } });
+    if (academicSupervisorFound) {
+        throw new Error("Academic supervisor credentials already exist")
+    }
+
     const file = req.file;
     let photo = undefined;
     if (file) {
         photo = await uploadImage(file);
     }
+
     const academicSupervisor = await AcademicSupervisor.findByIdAndUpdate(id, {
         firstName,
         lastName,
@@ -169,6 +176,7 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
+
     const io = req.app.get("io");
 
     receivers.forEach((receiverId) => {
@@ -182,13 +190,15 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
     })
 })
 
-//@desc Delete academic level
-//@route DELETE /api/v1/academic-levels/:id
+//@desc Delete academic superivsor
+//@route DELETE /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
-exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
+exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
 
-    const { name } = await AcademicLevel.findByIdAndDelete(id);
+    const { firstName, lastName } = await AcademicSupervisor.findByIdAndDelete(id);
+    
+    const name = `${firstName} ${lastName}`
 
     const { id: userId } = req.userAuth;
 
@@ -202,7 +212,7 @@ exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
         type: "SYSTEM",
         entity: name,
         entityType: "Academic Levels",
-        message: `New academic level "${name}" was deleted`,
+        message: `New academic supervisor "${name}" was deleted`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
@@ -212,9 +222,10 @@ exports.deleteAcademicLevelCtrl = AsyncHandler(async (req, res) => {
     receivers.forEach((receiverId) => {
         io.to(receiverId.toString()).emit("receiveNotification", notif)
     })
+
     res.status(200).json({
         status: "success",
-        message: "Academic level deleted successfully",
+        message: "Academic supervisor deleted successfully",
         data: {},
     });
 })

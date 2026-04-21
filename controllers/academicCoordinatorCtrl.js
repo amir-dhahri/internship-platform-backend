@@ -58,16 +58,20 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         linkedin,
         instagram
     } = req.body;
+
     const { id } = req.userAuth;
+
     const academicCoordinatorFound = await AcademicCoordinator.findOne({ email, _id: { $ne: id } });
     if (academicCoordinatorFound) {
         throw new Error("Academic coordinator credentials already exist")
     }
+
     const file = req.file;
     let photo = undefined;
     if (file) {
         photo = await uploadImage(file);
     }
+
     const academicCoordinator = await AcademicCoordinator.findByIdAndUpdate(id, {
         firstName,
         lastName,
@@ -87,9 +91,9 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         new: true
     });
 
-    const receivers = [id]
-
     const name = `${firstName} ${lastName}`
+    
+    const receivers = [id]
 
     const notif = await Notification.create({
         sender: id,
@@ -101,8 +105,6 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
-
-    console.log(notif);
 
     const io = req.app.get("io");
 
