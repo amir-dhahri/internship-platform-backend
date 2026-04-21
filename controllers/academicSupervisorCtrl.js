@@ -157,13 +157,15 @@ exports.updateAcademicLevelCtrl = AsyncHandler(async (req, res) => {
 
     const receivers = [userId]
 
+    const name = `${firstName} ${lastName}`
+
     const notif = await Notification.create({
         sender: userId,
         receivers,
         type: "SYSTEM",
-        entity: `${firstName} ${lastName}`,
+        entity: `${name}`,
         entityType: "Academic Supervisors",
-        message: `Academic supervisor "${firstName} ${lastName}" profile was updated`,
+        message: `Academic supervisor "${name}" profile was updated`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });

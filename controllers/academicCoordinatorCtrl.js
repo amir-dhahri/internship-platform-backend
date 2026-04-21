@@ -5,7 +5,7 @@ const University = require("../models/University");
 const { uploadImage } = require("../utils/cloudinary");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const generateToken = require("../utils/generateToken");
-const { default: Notification } = require("../models/Notification");
+const { default: Notification }  = require("../models/Notification");
 
 
 //@desc Register academic coordinator
@@ -89,16 +89,21 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
 
     const receivers = [id]
 
+    const name = `${firstName} ${lastName}`
+
     const notif = await Notification.create({
         sender: id,
         receivers,
         type: "SYSTEM",
-        entity: `${firstName} ${lastName}`,
+        entity: name,
         entityType: "Academic Coordinators",
-        message: `Academic coordinator "${firstName} ${lastName}" profile was updated`,
+        message: `Academic coordinator "${name}" profile was updated`,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
+
+    console.log(notif);
+
     const io = req.app.get("io");
 
     receivers.forEach((receiverId) => {
