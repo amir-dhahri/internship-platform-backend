@@ -91,7 +91,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         new: true
     });
 
-    const name = `${firstName} ${lastName}`
+    const name = `${academicCoordinator.firstName} ${academicCoordinator.lastName}`
     
     const receivers = [id]
 

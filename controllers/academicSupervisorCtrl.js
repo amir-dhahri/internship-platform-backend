@@ -162,7 +162,7 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 
     const receivers = [userId]
 
-    const name = `${firstName} ${lastName}`
+    const name = `${academicCoordinator.firstName} ${academicCoordinator.lastName}`
 
     const notif = await Notification.create({
         sender: userId,
