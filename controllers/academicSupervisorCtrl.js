@@ -16,13 +16,13 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
         email,
         password
     } = req.body;
-
+    
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email });
 
     if (academicSupervisorFound) {
         throw new Error("Academic supervisor already exists");
     }
-
+    
     const academicSupervisor = await AcademicSupervisor.create(
         {
             firstName,
@@ -192,8 +192,9 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@route DELETE /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
 exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
+    
     const { id } = req.params;
-
+    
     const { firstName, lastName } = await AcademicSupervisor.findByIdAndDelete(id);
 
     const name = `${firstName} ${lastName}`

@@ -48,7 +48,7 @@ const academicSupervisorSchema = new Schema(
             default: "#"
         },
         postalCode: {
-            type: Number,
+            type: String,
             default: "#"
         },
         facebook: {
