@@ -5,7 +5,7 @@ const University = require("../models/University");
 const { uploadImage } = require("../utils/cloudinary");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const generateToken = require("../utils/generateToken");
-const { default: Notification }  = require("../models/Notification");
+const { default: Notification } = require("../models/Notification");
 
 
 //@desc Register academic coordinator
@@ -92,7 +92,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
     });
 
     const name = `${academicCoordinator.firstName} ${academicCoordinator.lastName}`
-    
+
     const receivers = [id]
 
     const notif = await Notification.create({
@@ -263,7 +263,7 @@ exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const notifications = await Notification.find({
         receivers: { $in: id }
-    }).sort({createdAt: -1});
+    }).sort({ createdAt: -1 });
     res.status(200).send({
         status: "success",
         message: "Notifications fetched successfully",

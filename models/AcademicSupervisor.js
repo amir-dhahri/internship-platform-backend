@@ -33,7 +33,8 @@ const academicSupervisorSchema = new Schema(
             default: "#"
         },
         photo: {
-            type: String
+            type: String,
+            default: "#"
         },
         address: {
             type: String,

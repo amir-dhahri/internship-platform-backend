@@ -5,6 +5,7 @@ const AcademicCoordinator = require("../models/AcademicCoordinator");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
 const AcademicYear = require("../models/AcademicYear");
 const { hashPassword } = require("../utils/helpers");
+const { uploadImage } = require("../utils/cloudinary");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -16,13 +17,13 @@ exports.registerAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
         email,
         password
     } = req.body;
-    
+
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email });
 
     if (academicSupervisorFound) {
         throw new Error("Academic supervisor already exists");
     }
-    
+
     const academicSupervisor = await AcademicSupervisor.create(
         {
             firstName,
@@ -111,6 +112,7 @@ exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/academic-supervisors/:id/profile
 //@access Private University Coordinator Only
 exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
+
     const {
         firstName,
         lastName,
@@ -123,15 +125,16 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
         facebook,
         x,
         linkedin,
-        instagram
+        instagram,
+        email
     } = req.body;
     const { id } = req.params;
-
+    
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email, _id: { $ne: id } });
     if (academicSupervisorFound) {
         throw new Error("Academic supervisor credentials already exist")
     }
-
+    
     const file = req.file;
     let photo = undefined;
     if (file) {
@@ -192,9 +195,9 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@route DELETE /api/v1/academic-supervisors/:id
 //@access Private University Coordinator Only
 exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
-    
+
     const { id } = req.params;
-    
+
     const { firstName, lastName } = await AcademicSupervisor.findByIdAndDelete(id);
 
     const name = `${firstName} ${lastName}`

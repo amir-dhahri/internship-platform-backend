@@ -19,7 +19,7 @@ academicSupervisorsRouter.get("/", isLogin, isAcademicCoordinator, getAcademicSu
 academicSupervisorsRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
 
 // Update Academic Supervisor Profile
-academicSupervisorsRouter.put("/:id/profile", isLogin, isAcademicCoordinator, updateAcademicSupervisorProfileCtrl);
+academicSupervisorsRouter.put("/:id/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicSupervisorProfileCtrl);
 
 // Get Academic Supervisor Profile
 academicSupervisorsRouter.get("/:id/profile", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
