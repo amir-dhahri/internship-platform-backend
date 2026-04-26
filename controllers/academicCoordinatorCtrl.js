@@ -270,14 +270,15 @@ exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
 //@route GET /api/v1/academic-coordinators/logout
 //@access  Private Academic Coordinator Only
 exports.logoutCtrl = AsyncHandler(async (req, res) => {
-    res.cookie("token", {
+    res.clearCookie("token", {
         httpOnly: true,
         secure: false,
         sameSite: "strict",
-        expires: new Date(0)
+        path: "/",
     });
+
     res.status(200).json({
         status: "success",
         message: "Logged out successfully"
-    })
-})
+    });
+});
