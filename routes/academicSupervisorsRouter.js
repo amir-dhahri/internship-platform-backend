@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl } = require("../controllers/academicSupervisorCtrl");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl } = require("../controllers/academicSupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -29,6 +29,9 @@ academicSupervisorsRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteA
 
 // Update Academic Supervisor profile
 academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
+
+// Login Academic Supervisor
+academicSupervisorsRouter.post("/login", loginAcademicSupervisorCtrl);
 
 module.exports = academicSupervisorsRouter;
 

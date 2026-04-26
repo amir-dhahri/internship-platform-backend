@@ -4,8 +4,9 @@ const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
 const AcademicYear = require("../models/AcademicYear");
-const { hashPassword } = require("../utils/helpers");
+const { hashPassword, isPassMatched } = require("../utils/helpers");
 const { uploadImage } = require("../utils/cloudinary");
+const generateToken = require("../utils/generateToken");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -259,7 +260,7 @@ exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res)
     }
     
     await academicSupervisor.save();
-    
+
     const name = `${academicSupervisor.firstName} ${academicSupervisor.lastName}`
     
     const message = exists
@@ -294,4 +295,43 @@ exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res)
         message: "Academic year assigned successfully",
         data: academicSupervisor
     });
+})
+
+//@desc Login academic supervisor
+//@route POST /api/v1/academic-supervisors/login
+//@access Private Academic Supervisors Only
+exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
+    
+    const { email, password } = req.body;
+
+    const academicSupervisor = await AcademicSupervisor.findOne({ email });
+
+    // Check if email exists
+
+    if (!academicSupervisor) {
+        throw new Error("Invalid login credentials");
+    }
+    
+    
+    const isMatched = await isPassMatched(password, academicSupervisor.password);
+
+
+    if (!isMatched) {
+        throw new Error("Invalid login credentials");
+    }
+
+    const token = generateToken(academicSupervisor._id, "academic-supervisor");
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: false,        // true in production (HTTPS)
+        sameSite: 'strict',  // or 'lax' depending on your setup
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+    });
+    res.status(200)
+        .json({
+            status: "success",
+            message: "Academic supervisor logged in successfully",
+            // data: token
+        })
 })

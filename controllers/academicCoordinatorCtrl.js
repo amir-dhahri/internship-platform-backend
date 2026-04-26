@@ -125,8 +125,6 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
 exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    console.log("Email: ", email);
-    console.log("Password: ", password);
     const academicCoordinator = await AcademicCoordinator.findOne({ email });
 
     // Check if email exists
@@ -136,9 +134,6 @@ exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     }
 
     const isMatched = await isPassMatched(password, academicCoordinator.password);
-
-    console.log("IsMatched: ", isMatched);
-
 
     if (!isMatched) {
         throw new Error("Invalid login credentials");
@@ -268,5 +263,21 @@ exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
         status: "success",
         message: "Notifications fetched successfully",
         data: notifications
+    })
+})
+
+//@desc Logout Academic Coordinator
+//@route GET /api/v1/academic-coordinators/logout
+//@access  Private Academic Coordinator Only
+exports.logoutCtrl = AsyncHandler(async (req, res) => {
+    res.cookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        expires: new Date(0)
+    });
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully"
     })
 })
