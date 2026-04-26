@@ -129,12 +129,12 @@ exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
         email
     } = req.body;
     const { id } = req.params;
-    
+
     const academicSupervisorFound = await AcademicSupervisor.findOne({ email, _id: { $ne: id } });
     if (academicSupervisorFound) {
         throw new Error("Academic supervisor credentials already exist")
     }
-    
+
     const file = req.file;
     let photo = undefined;
     if (file) {
@@ -235,20 +235,34 @@ exports.deleteAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 //@desc Assign academic year
 //@route POST /api/v1/academic-supervisors/:id/academic-years
 //@access Private University Coordinator Only
-exports.assignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
+exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id: supervisorId } = req.params;
     const { academicYearId } = req.body;
     const academicSupervisor = await AcademicSupervisor.findById(supervisorId);
     if (!academicSupervisor) {
-        throw new Error("Academic supervisor not found");
+        throw new Error("Academic spervisor not found");
     }
-    if (academicSupervisor.academicYears.includes(academicYearId)) {
-        throw new Error("Academic year already assigned");
+    const academicYear = await AcademicYear.findById(academicYearId);
+    if (!academicYear) {
+        throw new Error("Academic year not found");
     }
-    academicSupervisor.academicYears.push(academicYearId);
+    const exists = academicSupervisor.academicYears.some(
+        (id) => id.toString() === academicYearId
+    );
+
+    if (exists) {
+        academicSupervisor.academicYears = academicSupervisor.academicYears.filter(
+            (id) => id.toString() !== academicYearId
+        );
+    } else {
+        academicSupervisor.academicYears.push(academicYearId);
+    }
+
     await academicSupervisor.save();
 
-    const academicYear = await AcademicYear.findById(academicYearId);
+    const message = exists
+        ? `Academic supervisor "${name}" was unassigned from academic year "${academicYear.name}".`
+        : `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}".`;
 
     const name = `${academicSupervisor.firstName} ${academicSupervisor.lastName}`
 
@@ -264,7 +278,7 @@ exports.assignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res) => {
         type: "SYSTEM",
         entity: name,
         entityType: "Academic Supervisors",
-        message: `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}."`,
+        message: message,
         isRead: false,
         senderPhoto: academicCoordinator.photo
     });
