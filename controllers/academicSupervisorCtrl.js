@@ -257,17 +257,17 @@ exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res)
     } else {
         academicSupervisor.academicYears.push(academicYearId);
     }
-
+    
     await academicSupervisor.save();
-
-    const message = exists
-        ? `Academic supervisor "${name}" was unassigned from academic year "${academicYear.name}".`
-        : `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}".`;
-
+    
     const name = `${academicSupervisor.firstName} ${academicSupervisor.lastName}`
-
+    
+    const message = exists
+    ? `Academic supervisor "${name}" was unassigned from academic year "${academicYear.name}".`
+    : `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}".`;
+    
     const { id: userId } = req.userAuth;
-
+    
     const academicCoordinator = await AcademicCoordinator.findById(userId);
 
     const receivers = [userId]
