@@ -321,6 +321,7 @@ exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     }
 
     const token = generateToken(academicSupervisor._id, "academic-supervisor");
+    
     res.cookie('token', token, {
         httpOnly: true,
         secure: false,        // true in production (HTTPS)
