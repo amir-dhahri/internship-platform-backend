@@ -144,7 +144,7 @@ exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     res.cookie('token', token, {
         httpOnly: true,
         secure: false,        // true in production (HTTPS)
-        sameSite: 'strict',  // or 'lax' depending on your setup
+        sameSite: 'lax',  // or 'lax' depending on your setup
         path: '/',
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
@@ -274,7 +274,7 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: false,
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
     });
 
