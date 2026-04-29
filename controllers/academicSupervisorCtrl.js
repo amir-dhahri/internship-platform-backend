@@ -1,5 +1,4 @@
 const AsyncHandler = require("express-async-handler");
-const AcademicLevel = require("../models/AcademicLevel");
 const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
@@ -258,17 +257,17 @@ exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res)
     } else {
         academicSupervisor.academicYears.push(academicYearId);
     }
-    
+
     await academicSupervisor.save();
 
     const name = `${academicSupervisor.firstName} ${academicSupervisor.lastName}`
-    
+
     const message = exists
-    ? `Academic supervisor "${name}" was unassigned from academic year "${academicYear.name}".`
-    : `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}".`;
-    
+        ? `Academic supervisor "${name}" was unassigned from academic year "${academicYear.name}".`
+        : `Academic supervisor "${name}" was assigned a new academic year "${academicYear.name}".`;
+
     const { id: userId } = req.userAuth;
-    
+
     const academicCoordinator = await AcademicCoordinator.findById(userId);
 
     const receivers = [userId]
@@ -301,7 +300,7 @@ exports.toggleAssignAcademicYearToSupervisorCtrl = AsyncHandler(async (req, res)
 //@route POST /api/v1/academic-supervisors/login
 //@access Private Academic Supervisors Only
 exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
-    
+
     const { email, password } = req.body;
 
     const academicSupervisor = await AcademicSupervisor.findOne({ email });
@@ -311,8 +310,8 @@ exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     if (!academicSupervisor) {
         throw new Error("Invalid login credentials");
     }
-    
-    
+
+
     const isMatched = await isPassMatched(password, academicSupervisor.password);
 
 
@@ -321,7 +320,7 @@ exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     }
 
     const token = generateToken(academicSupervisor._id, "academic-supervisor");
-    
+
     res.cookie('token', token, {
         httpOnly: true,
         secure: false,        // true in production (HTTPS)
@@ -342,12 +341,12 @@ exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 //@access Private University Supervisor 
 exports.fetchAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
-    
+
     const academicSupervisor = await AcademicSupervisor.findById(id).select("-password");
     if (!academicSupervisor) {
         throw new Error("Academic superivor Not Found!");
     }
-    
+
     res.status(200).json({
         status: "success",
         message: "Academic superivor fetched successfully",
@@ -435,3 +434,38 @@ exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
         data: academicSupervisor,
     })
 })
+
+
+//@desc Get all notifications 
+//@route GET /api/v1/academic-supervisors/notifications
+//@access  Private Academic Supervisor Only
+exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
+    console.log("Notifications");
+    
+    const { id } = req.userAuth;
+    const notifications = await Notification.find({
+        receivers: { $in: id }
+    }).sort({ createdAt: -1 });
+    res.status(200).send({
+        status: "success",
+        message: "Notifications fetched successfully",
+        data: notifications
+    })
+})
+
+//@desc Logout Academic Supervisor
+//@route GET /api/v1/academic-supervisors/logout
+//@access  Private Academic Supervisor Only
+exports.logoutCtrl = AsyncHandler(async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully"
+    });
+});
