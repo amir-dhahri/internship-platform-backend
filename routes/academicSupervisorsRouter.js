@@ -35,10 +35,10 @@ academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordin
 academicSupervisorsRouter.post("/login", loginAcademicSupervisorCtrl);
 
 // Get Academic Supervisor Profile
-academicSupervisorsRouter.get("/fetch-profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
+academicSupervisorsRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
 
 // Update Academic Supervisor Profile
-academicSupervisorsRouter.put("/modify-profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
+academicSupervisorsRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
 
 
 module.exports = academicSupervisorsRouter;
