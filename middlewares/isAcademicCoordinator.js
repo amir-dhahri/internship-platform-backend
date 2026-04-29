@@ -1,6 +1,8 @@
 const AcademicCoordinator = require("../models/AcademicCoordinator");
 
 const isAcademicCoordinator = async (req, res, next) => {
+    console.log(req.url);
+    
     const { id } = req.userAuth;
     const academicCoordinatorFound = await AcademicCoordinator.findById(id);
 
