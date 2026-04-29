@@ -95,7 +95,7 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 
 //@desc Get academic supervisor profile
 //@route GET /api/v1/academic-supervisors/:id/profile
-//@access Private University Coordinator Only
+//@access Private University Coordinators & Supervisors Only
 exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
     const academicSupervisor = await AcademicSupervisor.findById(id).select("-password");
@@ -111,7 +111,7 @@ exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 
 //@desc Update academic supervisor profile
 //@route PUT /api/v1/academic-supervisors/:id/profile
-//@access Private University Coordinator Only
+//@access Private University Coordinators & Supervisors Only
 exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 
     const {
