@@ -439,9 +439,7 @@ exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@desc Get all notifications 
 //@route GET /api/v1/academic-supervisors/notifications
 //@access  Private Academic Supervisor Only
-exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
-    console.log("Notifications");
-    
+exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {    
     const { id } = req.userAuth;
     const notifications = await Notification.find({
         receivers: { $in: id }
