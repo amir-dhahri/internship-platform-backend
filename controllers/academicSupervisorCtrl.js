@@ -95,7 +95,7 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
 
 //@desc Get academic supervisor profile
 //@route GET /api/v1/academic-supervisors/:id/profile
-//@access Private University Coordinators & Supervisors Only
+//@access Private University Coordinators 
 exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
     const academicSupervisor = await AcademicSupervisor.findById(id).select("-password");
@@ -111,7 +111,7 @@ exports.getAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 
 //@desc Update academic supervisor profile
 //@route PUT /api/v1/academic-supervisors/:id/profile
-//@access Private University Coordinators & Supervisors Only
+//@access Private University Coordinators 
 exports.updateAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 
     const {
@@ -335,4 +335,103 @@ exports.loginAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
             message: "Academic supervisor logged in successfully",
             // data: token
         })
+})
+
+//@desc Get academic supervisor profile
+//@route GET /api/v1/academic-supervisors/profile
+//@access Private University Supervisor 
+exports.fetchAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    
+    const academicSupervisor = await AcademicSupervisor.findById(id).select("-password");
+    if (!academicSupervisor) {
+        throw new Error("Academic superivor Not Found!");
+    }
+    
+    res.status(200).json({
+        status: "success",
+        message: "Academic superivor fetched successfully",
+        data: academicSupervisor,
+    });
+})
+
+//@desc Update academic supervisor profile
+//@route PUT /api/v1/academic-supervisors/profile
+//@access Private University Supervisors 
+exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
+
+    const {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        email
+    } = req.body;
+    const { id } = req.userAuth;
+
+    const academicSupervisorFound = await AcademicSupervisor.findOne({ email, _id: { $ne: id } });
+    if (academicSupervisorFound) {
+        throw new Error("Academic supervisor credentials already exist")
+    }
+
+    const file = req.file;
+    let photo = undefined;
+    if (file) {
+        photo = await uploadImage(file);
+    }
+
+    const academicSupervisor = await AcademicSupervisor.findByIdAndUpdate(id, {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        photo
+    }, {
+        new: true
+    });
+
+    const academicCoordinator = await AcademicCoordinator.findById(id);
+
+    const receivers = [id]
+
+    const name = `${academicCoordinator.firstName} ${academicCoordinator.lastName}`
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: `${name}`,
+        entityType: "Academic Supervisors",
+        message: `Academic supervisor "${name}" profile was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Academic supervisor profile updated successfully",
+        data: academicSupervisor,
+    })
 })

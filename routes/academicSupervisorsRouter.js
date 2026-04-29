@@ -2,8 +2,8 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl } = require("../controllers/academicSupervisorCtrl");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl } = require("../controllers/academicSupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -35,11 +35,10 @@ academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordin
 academicSupervisorsRouter.post("/login", loginAcademicSupervisorCtrl);
 
 // Get Academic Supervisor Profile
-academicSupervisorsRouter.get("/profile", isLogin, isAcademicSupervisor, getAcademicSupervisorProfileCtrl);
+academicSupervisorsRouter.get("/fetch-profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
 
 // Update Academic Supervisor Profile
-academicSupervisorsRouter.get("/profile", isLogin, isAcademicSupervisor, updateAcademicSupervisorProfileCtrl);
-
+academicSupervisorsRouter.put("/modify-profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
 
 
 module.exports = academicSupervisorsRouter;
