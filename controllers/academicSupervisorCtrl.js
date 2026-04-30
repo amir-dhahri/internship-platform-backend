@@ -476,13 +476,16 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
     const academicSupervisor = await AcademicSupervisor.findById(id).populate({
         path: "academicYears",
         populate: {
-            path: "academicLevel",
+            path: "academicLevelId",
             populate: {
-                path: "department"
+                path: "departmentId"
             }
         }
     });
-    
+    const result = {};
+    academicSupervisor.academicYears.forEach(academicYear => {
+        
+    })
     res.status(200).json({
         status: "success",
         message: "Academic ",

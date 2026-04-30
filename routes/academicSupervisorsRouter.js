@@ -10,6 +10,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const academicSupervisorsRouter = express.Router();
 
+// Get Academic Supervisor Departments
+academicSupervisorsRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
+
 // Register Academic Supervisor
 academicSupervisorsRouter.post("/", isLogin, isAcademicCoordinator, registerAcademicSupervisorCtrl);
 
@@ -45,8 +48,6 @@ academicSupervisorsRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteA
 // Assing Academic Supervisor Academic Years
 academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
 
-// Get Academic Supervisor Departments
-academicSupervisorsRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
 
 
 module.exports = academicSupervisorsRouter;
