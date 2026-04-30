@@ -467,3 +467,25 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
         message: "Logged out successfully"
     });
 });
+
+//@desc Get Academic Supervisor Departments
+//@route GET /api/v1/academic-supervisors/departments
+//@access Private Academic Supervisor Only
+exports.getDepartments = AsyncHandler(async (req, res) => {
+    const {id} = req.userAuth;
+    const academicSupervisor = await AcademicSupervisor.findById(id).populate({
+        path: "academicYears",
+        populate: {
+            path: "academicLevel",
+            populate: {
+                path: "department"
+            }
+        }
+    });
+    
+    res.status(200).json({
+        status: "success",
+        message: "Academic ",
+        data: academicSupervisor
+    })
+})

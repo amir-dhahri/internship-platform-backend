@@ -3,7 +3,7 @@ const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl } = require("../controllers/academicSupervisorCtrl");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments } = require("../controllers/academicSupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -28,7 +28,7 @@ academicSupervisorsRouter.post("/login", loginAcademicSupervisorCtrl);
 academicSupervisorsRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
 
 // Login Academic Supervisor
-academicSupervisorsRouter.post("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
+academicSupervisorsRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
 
 // Get Academic Supervisor
 academicSupervisorsRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
@@ -42,8 +42,11 @@ academicSupervisorsRouter.get("/:id/profile", isLogin, isAcademicCoordinator, ge
 // Delete Academic Supervisor 
 academicSupervisorsRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteAcademicSupervisorCtrl);
 
-// Update Academic Supervisor profile
+// Assing Academic Supervisor Academic Years
 academicSupervisorsRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
+
+// Get Academic Supervisor Departments
+academicSupervisorsRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
 
 
 module.exports = academicSupervisorsRouter;
