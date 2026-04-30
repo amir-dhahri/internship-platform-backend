@@ -468,10 +468,10 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
     });
 });
 
-//@desc Get Academic Supervisor Departments
-//@route GET /api/v1/academic-supervisors/departments
+//@desc Get Academic Supervisor Academic Years
+//@route GET /api/v1/academic-supervisors/academic-years
 //@access Private Academic Supervisor Only
-exports.getDepartments = AsyncHandler(async (req, res) => {
+exports.getAcademicYears = AsyncHandler(async (req, res) => {
     const {id} = req.userAuth;
     const academicSupervisor = await AcademicSupervisor.findById(id).populate({
         path: "academicYears",
@@ -482,13 +482,28 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
             }
         }
     });
-    const result = {};
-    academicSupervisor.academicYears.forEach(academicYear => {
-        
+    const academicYears = academicSupervisor.academicYears;
+    res.status(200).json({
+        status: "success",
+        message: "Academic years fetched successfully",
+        data: academicYears
+    })
+})
+
+//@desc Get Academic Supervisor Academic Year
+//@route GET /api/v1/academic-supervisors/academic-years/:id
+//@access Private Academic Supervisor
+exports.getAcademicYear = AsyncHandler(async (req, res) => {
+    const {id} = req.userAuth;
+    const academicYear = await AcademicYear.findById(id).populate({
+        path: "academicLevelId",
+        populate: {
+            path: "departmentId",
+        }
     })
     res.status(200).json({
         status: "success",
-        message: "Academic ",
-        data: academicSupervisor
+        message: "Academic year fetched successfully",
+        data: academicYear
     })
 })
