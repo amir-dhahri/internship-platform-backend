@@ -1,56 +1,56 @@
 const express = require("express");
-const { registerStudentCtrl,
-    loginStudentCtrl,
-    getStudentsCtrl,
-    updateStudentCtrl,
-    deleteStudentCtrl,
-    studentSuspendTeacherCtrl,
-    studentUnsuspendTeacherCtrl,
-    studentWithdrawTeacherCtrl,
-    studentUnwithdrawTeacherCtrl,
-    studentPublishExamCtrl,
-    studentUnpublishExamCtrl,
-    getStudentProfileCtrl } = require("../controllers/studentCtrl");
+const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
-const isStudent = require("../middlewares/isStudent");
+const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
+const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getAcademicYears, getStudents } = require("../controllers/academicSupervisorCtrl");
+
+const upload = multer({ storage: multer.memoryStorage() });
+
 
 const studentRouter = express.Router();
 
-// Register
-studentRouter.post("/register", registerStudentCtrl)
+// Get Student
+studentRouter.get("/academic-years/:id", isLogin, isAcademicSupervisor, getStudents);
 
-// login
-studentRouter.post("/login", loginStudentCtrl)
+// Get Academic Supervisor Departments
+studentRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
 
-// Get all 
-studentRouter.get("/", isLogin, isStudent, getStudentsCtrl)
+// Register Academic Supervisor
+studentRouter.post("/", isLogin, isAcademicCoordinator, registerAcademicSupervisorCtrl);
 
-// Get single 
-studentRouter.get("/profile", isLogin, isStudent, getStudentProfileCtrl)
+// Get Academic Supervisors
+studentRouter.get("/", isLogin, isAcademicCoordinator, getstudentCtrl);
 
-// Update 
-studentRouter.put("/", isLogin, isStudent, updateStudentCtrl)
+// Get Academic Supervisor Profile
+studentRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
 
-// Delete 
-studentRouter.delete("/:id", deleteStudentCtrl)
+// Update Academic Supervisor Profile
+studentRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
 
-// Suspend 
-studentRouter.put("/suspend/teacher/:id", studentSuspendTeacherCtrl)
+// Login Academic Supervisor
+studentRouter.post("/login", loginAcademicSupervisorCtrl);
 
-// Unsuspend 
-studentRouter.put("/unsuspend/teacher/:id", studentUnsuspendTeacherCtrl)
+// Login Academic Supervisor
+studentRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
 
-// Withdraw
-studentRouter.put("/withdraw/teacher/:id", studentWithdrawTeacherCtrl)
+// Login Academic Supervisor
+studentRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
 
-// unwithdraw 
-studentRouter.put("/unwithdraw/teacher/:id", studentUnwithdrawTeacherCtrl)
+// Get Academic Supervisor
+studentRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
 
-// publish 
-studentRouter.put("/publish/exam/:id", studentPublishExamCtrl)
+// Update Academic Supervisor Profile
+studentRouter.put("/:id/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicSupervisorProfileCtrl);
 
-// Unpublish
-studentRouter.put("/unpublish/exam/:id", studentUnpublishExamCtrl)
+// Get Academic Supervisor Profile
+studentRouter.get("/:id/profile", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
+
+// Delete Academic Supervisor 
+studentRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteAcademicSupervisorCtrl);
+
+// Assing Academic Supervisor Academic Years
+studentRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
 
 
-module.exports = studentRouter; 
+module.exports = studentRouter;

@@ -1,72 +1,308 @@
-const AsyncHandler = require("express-async-handler")
+const AsyncHandler = require("express-async-handler");
+const { default: Notification } = require("../models/Notification");
+const AcademicCoordinator = require("../models/AcademicCoordinator");
 const Student = require("../models/Student");
-const generateToken = require("../utils/generateToken");
+const AcademicYear = require("../models/AcademicYear");
 const { hashPassword, isPassMatched } = require("../utils/helpers");
+const { uploadImage } = require("../utils/cloudinary");
+const generateToken = require("../utils/generateToken");
+const AcademicSupervisor = require("../models/AcademicSupervisor");
 
 //@desc Register student
-//@route POST /api/v1/students/register
-//@access Private
+//@route POST /api/v1/students/
+//@access Private Academic Supervisors Only
+
 exports.registerStudentCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,
-        middleName,
         lastName,
         email,
-        phone,
-        photo,
-        country,
-        city,
-        address,
-        department,
-        degree,
-        university,
-        year,
-        skills,
-        cv,
-        linkedin,
-        github,
-        password } = req.body;
+        password
+    } = req.body;
 
-    // Check if email exists
-    const StudentFound = await Student.findOne({ email });
-    if (StudentFound) {
+    const studentFound = await Student.findOne({ email });
+
+    if (studentFound) {
         throw new Error("Student already exists");
     }
 
-    // Register
-    const Student = await Student.create(
+    const student = await Student.create(
         {
             firstName,
-            middleName,
             lastName,
             email,
-            phone,
-            photo,
-            country,
-            city,
-            address,
-            department,
-            degree,
-            university,
-            year,
-            skills,
-            cv,
-            linkedin,
-            github,
-            password: await hashPassword(password)
+            password: await hashPassword(password),
         }
     )
+
+    const { id } = req.userAuth;
+
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: `${firstName} ${lastName}`,
+        entityType: "Students",
+        message: `New student "${firstName} ${lastName}" was registered`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
     res.status(201).json({
         status: "success",
         message: "Student registered successfully",
-        data: Student,
+        data: student,
     })
 })
 
-//@desc Login student
+//@desc Get all students
+//@route GET /api/v1/students/
+//@access Private Academic Supervisor Only
+exports.getStudentsCtrl = AsyncHandler(async (req, res) => {
+    const students = await Student.find().select("-password");
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Students fetched successfully",
+            data: students,
+        }
+    );
+})
+
+//@desc Get student
+//@route GET /api/v1/students/:id
+//@access Private Academic Supervisor Only
+exports.getStudentCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const student = await Student.findById(id);
+    if (!student) {
+        throw new Error("Student Not Found!");
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Student fetched successfully",
+        data: student,
+    });
+})
+
+//@desc Get student profile
+//@route GET /api/v1/students/:id/profile
+//@access Private Academic Supervisor
+exports.getStudentProfileCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const student = await Student.findById(id).select("-password");
+    if (!student) {
+        throw new Error("Student Not Found!");
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Student fetched successfully",
+        data: student,
+    });
+})
+
+//@desc Update student profile
+//@route PUT /api/v1/students/:id/profile
+//@access Private Academic Supervisor
+exports.updateStudentProfileCtrl = AsyncHandler(async (req, res) => {
+    const {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        email
+    } = req.body;
+    const { id } = req.params;
+
+    const studentFound = await Student.findOne({ email, _id: { $ne: id } });
+    if (studentFound) {
+        throw new Error("Student credentials already exist")
+    }
+
+    const file = req.file;
+    let photo = undefined;
+    if (file) {
+        photo = await uploadImage(file);
+    }
+
+    const student = await Student.findByIdAndUpdate(id, {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        photo
+    }, {
+        new: true
+    });
+
+    const { id: userId } = req.userAuth;
+
+    const academicSupervisor = await AcademicSupervisor.findById(userId);
+
+    const receivers = [userId]
+
+    const name = `${student.firstName} ${student.lastName}`
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: `${name}`,
+        entityType: "Academic Supervisors",
+        message: `Student "${name}" profile was updated`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Student profile updated successfully",
+        data: student,
+    })
+})
+
+//@desc Delete student
+//@route DELETE /api/v1/students/:id
+//@access Private Academic Supervisor Only
+exports.deleteStudentCtrl = AsyncHandler(async (req, res) => {
+
+    const { id } = req.params;
+
+    const { firstName, lastName } = await Student.findByIdAndDelete(id);
+
+    const name = `${firstName} ${lastName}`
+
+    const { id: userId } = req.userAuth;
+
+    const academicSupervisor = await AcademicSupervisor.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Students",
+        message: `New student "${name}" was deleted`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Student deleted successfully",
+        data: {},
+    });
+})
+
+//@desc Assign academic year
+//@route POST /api/v1/students/:id/academic-years
+//@access Private Academic Supervisor Only
+exports.toggleAssignAcademicYearToStudentCtrl = AsyncHandler(async (req, res) => {
+    const { id: studentId } = req.params;
+    const { academicYearId } = req.body;
+    const student = await Student.findById(studentId);
+    if (!student) {
+        throw new Error("Student not found");
+    }
+    const academicYear = await AcademicYear.findById(academicYearId);
+    if (!academicYear) {
+        throw new Error("Academic year not found");
+    }
+    const exists = Student.academicYears.some(
+        (id) => id.toString() === academicYearId
+    );
+
+    if (exists) {
+        student.academicYears = student.academicYears.filter(
+            (id) => id.toString() !== academicYearId
+        );
+    } else {
+        student.academicYears.push(academicYearId);
+    }
+
+    await student.save();
+
+    const name = `${student.firstName} ${student.lastName}`
+
+    const message = exists
+        ? `Student "${name}" was unassigned from academic year "${academicYear.name}".`
+        : `Student "${name}" was assigned a new academic year "${academicYear.name}".`;
+
+    const { id: userId } = req.userAuth;
+
+    const academicSupervisor = await AcademicSupervisor.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Students",
+        message: message,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Academic year assigned successfully",
+        data: student
+    });
+})
+
+//@desc Login students
 //@route POST /api/v1/students/login
-//@access Private
+//@access Private Students Only
 exports.loginStudentCtrl = AsyncHandler(async (req, res) => {
+
     const { email, password } = req.body;
 
     const student = await Student.findOne({ email });
@@ -77,257 +313,221 @@ exports.loginStudentCtrl = AsyncHandler(async (req, res) => {
         throw new Error("Invalid login credentials");
     }
 
-    const isMatched = isPassMatched(password, Student.password);
+
+    const isMatched = await isPassMatched(password, student.password);
+
 
     if (!isMatched) {
         throw new Error("Invalid login credentials");
     }
 
-    const token = generateToken(Student._id);
+    const token = generateToken(student._id, "student");
+
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: false,        // true in production (HTTPS)
+        sameSite: 'lax',  // or 'lax' depending on your setup
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+    });
 
     res.status(200)
         .json({
             status: "success",
             message: "Student logged in successfully",
-            data: token,
         })
-})
-
-//@desc Get all Students
-//@route GET /api/v1/Students
-//@access Private
-exports.getStudentsCtrl = AsyncHandler(async (req, res) => {
-    const students = await Student.find();
-    res.status(200).json(
-        {
-            status: "success",
-            message: "Students fetched successfully",
-            data: students,
-        }
-    );
 })
 
 //@desc Get student profile
 //@route GET /api/v1/students/profile
-//@access Private
-exports.getStudentProfileCtrl = AsyncHandler(async (req, res) => {
+//@access Private Academic Supervisor
+exports.fetchStudentProfileCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
-    const student = await Student.findById(id).select(
-        "-password -createdAt -updatedAt"
-    );
+
+    const student = await Student.findById(id).select("-password");
     if (!student) {
         throw new Error("Student Not Found!");
     }
+
     res.status(200).json({
         status: "success",
-        message: "Student Profile fetched successfully",
+        message: "Student fetched successfully",
         data: student,
     });
 })
 
-//@desc Update student
-//@route PUT /api/v1/students/:id
-//@access Private
-exports.updateStudentCtrl = AsyncHandler(async (req, res) => {
-    const { firstName,
-        middleName,
+//@desc Update student profile
+//@route PUT /api/v1/students/profile
+//@access Private University Supervisors 
+exports.modifyStudentProfileCtrl = AsyncHandler(async (req, res) => {
+
+    const {
+        firstName,
         lastName,
-        email,
         phone,
-        photo,
-        country,
-        city,
+        bio,
         address,
-        department,
-        degree,
-        university,
-        year,
-        skills,
-        cv,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
         linkedin,
-        github,
-        password } = req.body;
-    // If email exists
+        instagram,
+        email
+    } = req.body;
     const { id } = req.userAuth;
-    const emailExist = await Student.findOne({ email });
-    if (emailExist) {
-        throw new Error("This email is taken/exists");
-    } else {
-        const student = await Student.findByIdAndUpdate(id,
-            {
-                firstName,
-                middleName,
-                lastName,
-                email,
-                phone,
-                photo,
-                country,
-                city,
-                address,
-                department,
-                degree,
-                university,
-                year,
-                skills,
-                cv,
-                linkedin,
-                github,
-                password: await hashPassword(password),
-            }, {
-            new: true,
-            runValidators: true
-        });
-        res.status(200).json({
-            status: "success",
-            message: "Student updated successfully",
-            data: student
-        })
+
+    const studentFound = await Student.findOne({ email, _id: { $ne: id } });
+    if (studentFound) {
+        throw new Error("Student credentials already exist")
     }
+
+    const file = req.file;
+    let photo = undefined;
+    if (file) {
+        photo = await uploadImage(file);
+    }
+
+    const student = await Student.findByIdAndUpdate(id, {
+        firstName,
+        lastName,
+        phone,
+        bio,
+        address,
+        city,
+        country,
+        postalCode,
+        facebook,
+        x,
+        linkedin,
+        instagram,
+        photo
+    }, {
+        new: true
+    });
+
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+
+    const receivers = [id]
+
+    const name = `${student.firstName} ${student.lastName}`
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: `${name}`,
+        entityType: "Students",
+        message: `Student "${name}" profile was updated`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Student profile updated successfully",
+        data: student,
+    })
 })
 
-//@desc Delete Student
-//@route DELETE /api/v1/Students/:id
-//@access Private
-exports.deleteStudentCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Delete Student"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
+
+//@desc Get all notifications 
+//@route GET /api/v1/students/notifications
+//@access  Private Students Only
+exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const notifications = await Notification.find({
+        receivers: { $in: id }
+    }).sort({ createdAt: -1 });
+    res.status(200).send({
+        status: "success",
+        message: "Notifications fetched successfully",
+        data: notifications
+    })
 })
 
-//@desc Student suspends a teacher
-//@route PUT /api/v1/Students/suspend/teacher/:id
-//@access Private
-exports.studentSuspendTeacherCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student suspend teacher"
+//@desc Logout Student
+//@route GET /api/v1/students/logout
+//@access  Private Student Only
+exports.logoutCtrl = AsyncHandler(async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully"
+    });
+});
+
+
+//@desc Get Student Departments
+//@route GET /api/v1/students/departments
+//@access Private Student Only
+exports.getDepartments = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const student = await Student.findById(id).populate({
+        path: "academicYears",
+        populate: {
+            path: "academicLevelId",
+            populate: {
+                path: "departmentId"
             }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
+        }
+    });
+
+    const years = student.academicYears;
+
+    const departments = {};
+
+    years.forEach(year => {
+        const level = year.academicLevelId;
+        const department = level.departmentId;
+        const depId = department._id.toString();
+        const levelId = level._id.toString();
+        if (!departments[depId]) {
+            departments[depId] = {
+                ...department,
+                academicLevels: {}
             }
-        );
-    }
+        }
+        if (!departments[depId].academicLevels[levelId]) {
+            departments[depId].academicLevels[levelId] = {
+                ...level,
+                academicYears: []
+            };
+        }
+        departments[depId].academicLevels[levelId].academicYears.push(year);
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Departments fetched successfully",
+        data: departments
+    })
 })
 
-//@desc Student unsuspends a teacher
-//@route PUT /api/v1/Students/unsuspend/teacher/:id
-//@access Private
-exports.studentUnsuspendTeacherCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student unsuspend teacher"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
-})
-
-//@desc Student withdraw a teacher
-//@route PUT /api/v1/Students/withdraw/teacher/:id
-//@access Private
-exports.studentWithdrawTeacherCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student withdraw teacher"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
-})
-
-//@desc Student unwithdraw a teacher
-//@route PUT /api/v1/Students/unwithdraw/teacher/:id
-//@access Private
-exports.studentUnwithdrawTeacherCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student unwithdraw teacher"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
-})
-
-//@desc Student publish exams results
-//@route PUT /api/v1/Students/publish/exam/:id
-//@access Private
-exports.studentPublishExamCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student publish exam results"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
-})
-
-//@desc Student unpublish exams results
-//@route PUT /api/v1/Students/unpublish/exam/:id
-//@access Private
-exports.studentUnpublishExamCtrl = AsyncHandler(async (req, res) => {
-    try {
-        res.status(200).json(
-            {
-                status: "success",
-                data: "Student unpublish exam results"
-            }
-        );
-    } catch (error) {
-        res.json(
-            {
-                status: "failed",
-                error: error.message
-            }
-        );
-    }
-})
+//@desc Get Academic Supervisor students
+//@route GET /api/v1/academic-supervisors/academic-years/:id
+//@access Private Academic Supervisor Only
+// exports.getStudents = AsyncHandler(async (req, res) => {
+//     const { id } = req.params;
+//     const students = await Student.find({
+//         academicYearId: id
+//     });
+//     res.status(200).json({
+//         status: "success",
+//         message: "Students fetched successfully",
+//         data: students
+//     })
+// })
