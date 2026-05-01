@@ -245,19 +245,17 @@ exports.toggleAssignAcademicYearToStudentCtrl = AsyncHandler(async (req, res) =>
         throw new Error("Student not found");
     }
     const academicYear = await AcademicYear.findById(academicYearId);
+
     if (!academicYear) {
         throw new Error("Academic year not found");
     }
-    const exists = Student.academicYears.some(
-        (id) => id.toString() === academicYearId
-    );
+
+    const exists = student.academicYearId?.toString() === academicYearId;
 
     if (exists) {
-        student.academicYears = student.academicYears.filter(
-            (id) => id.toString() !== academicYearId
-        );
+        student.academicYearId = null;
     } else {
-        student.academicYears.push(academicYearId);
+        student.academicYearId = academicYearId;
     }
 
     await student.save();
@@ -437,7 +435,6 @@ exports.modifyStudentProfileCtrl = AsyncHandler(async (req, res) => {
     })
 })
 
-
 //@desc Get all notifications 
 //@route GET /api/v1/students/notifications
 //@access  Private Students Only
@@ -486,9 +483,9 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
         }
     });
 
-    
+
     const departments = {};
-    
+
     const year = student.academicYearId;
     const level = year.academicLevelId;
     const department = level.departmentId;
