@@ -9,94 +9,76 @@ const studentSchema = new Schema(
             required: true,
             trim: true
         },
-        middlename: {
-            type: String,
-            required: false,
-            trim: true
-        },
         lastName: {
             type: String,
             required: true,
             trim: true
         },
-
         email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true
         },
-
         password: {
             type: String,
             required: true,
         },
-        role: {
-            type: String,
-            default: "student",
-        },
-
         phone: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         photo: {
-            type: String
+            type: String,
+            default: "#"
         },
-
+        bio: {
+            type: String,
+            default: "#"
+        },
         address: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         city: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         country: {
             type: String,
-            default: "Tunisia"
+            default: "#"
         },
-
-        university: {
-            type: Schema.Types.ObjectId,
-            ref: "University",
-            required: false,
-        },
-
-        department: {
-            type: String
-        },
-
-        degree: {
+        postalCode: {
             type: String,
-            enum: ["bachelor", "master", "engineering", "phd"],
-            default: "bachelor"
+            default: "#"
         },
-
-        year: {
-            type: Number
+        facebook: {
+            type: String,
+            default: "#"
         },
-
-        skills: [{
-            type: String
-        }],
-
-        cv: {
-            type: String
+        x: {
+            type: String,
+            default: "#"
         },
-
         linkedin: {
-            type: String
+            type: String,
+            default: "#"
         },
-
-        github: {
-            type: String
+        instagram: {
+            type: String,
+            default: "#"
         },
-
-
+        academicYearId: {
+            type: String,
+            default: "#"
+        },
+        role: {
+            type: String,
+            default: "student"
+        },
     },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 

@@ -1,6 +1,7 @@
 const AsyncHandler = require("express-async-handler");
 const { default: Notification } = require("../models/Notification");
 const AcademicCoordinator = require("../models/AcademicCoordinator");
+const Student = require("../models/Student");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
 const AcademicYear = require("../models/AcademicYear");
 const { hashPassword, isPassMatched } = require("../utils/helpers");
@@ -439,7 +440,7 @@ exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@desc Get all notifications 
 //@route GET /api/v1/academic-supervisors/notifications
 //@access  Private Academic Supervisor Only
-exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {    
+exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const notifications = await Notification.find({
         receivers: { $in: id }
@@ -468,11 +469,12 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
     });
 });
 
-//@desc Get Academic Supervisor Academic Years
-//@route GET /api/v1/academic-supervisors/academic-years
+
+//@desc Get Academic Supervisor Departments
+//@route GET /api/v1/academic-supervisors/departments
 //@access Private Academic Supervisor Only
-exports.getAcademicYears = AsyncHandler(async (req, res) => {
-    const {id} = req.userAuth;
+exports.getDepartments = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
     const academicSupervisor = await AcademicSupervisor.findById(id).populate({
         path: "academicYears",
         populate: {
@@ -482,28 +484,49 @@ exports.getAcademicYears = AsyncHandler(async (req, res) => {
             }
         }
     });
-    const academicYears = academicSupervisor.academicYears;
+    
+    const years = academicSupervisor.academicYears;
+    
+    const departments = {};
+
+    years.forEach(year => {
+        const level = year.academicLevelId;
+        const department = level.departmentId;
+        const depId = department._id.toString();
+        const levelId = level._id.toString();
+        if (!departments[depId]) {
+            departments[depId] = {
+                ...department,
+                academicLevels: {}
+            }
+        }
+        if (!departments[depId].academicLevels[levelId]) {
+            departments[depId].academicLevels[levelId] = {
+                ...level,
+                academicYears: []
+            }; 
+        }
+        departments[depId].academicLevels[levelId].academicYears.push(year);
+    });
+    
     res.status(200).json({
         status: "success",
-        message: "Academic years fetched successfully",
-        data: academicYears
+        message: "Departments fetched successfully",
+        data: departments
     })
 })
 
-//@desc Get Academic Supervisor Academic Year
+//@desc Get Academic Supervisor students
 //@route GET /api/v1/academic-supervisors/academic-years/:id
-//@access Private Academic Supervisor
-exports.getAcademicYear = AsyncHandler(async (req, res) => {
-    const {id} = req.userAuth;
-    const academicYear = await AcademicYear.findById(id).populate({
-        path: "academicLevelId",
-        populate: {
-            path: "departmentId",
-        }
-    })
+//@access Private Academic Supervisor Only
+exports.getStudents = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const students = await Student.find({
+        academicYearId: id
+    });
     res.status(200).json({
         status: "success",
-        message: "Academic year fetched successfully",
-        data: academicYear
+        message: "Students fetched successfully",
+        data: students
     })
 })
