@@ -9,6 +9,7 @@ const academicCoordinatorRouter = require("../routes/academicCoordinatorsRouter"
 const cookieParser = require("cookie-parser");
 const acdemicYearRouter = require("../routes/academicYearsRouter");
 const academicSupervisorsRouter = require("../routes/academicSupervisorsRouter");
+const studentRouter = require("../routes/studentRouter");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/v1/academic-levels", acdemicLevelRouter)
 app.use("/api/v1/academic-coordinators", academicCoordinatorRouter)
 app.use("/api/v1/academic-years", acdemicYearRouter)
 app.use("/api/v1/academic-supervisors", academicSupervisorsRouter)
+app.use("/api/v1/students", studentRouter)
 //=====Error Middlewares=====//
 app.use(notFoundError);
 app.use(globalErrHandler);

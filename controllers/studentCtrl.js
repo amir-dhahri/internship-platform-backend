@@ -477,7 +477,7 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
 exports.getDepartments = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const student = await Student.findById(id).populate({
-        path: "academicYears",
+        path: "academicYearId",
         populate: {
             path: "academicLevelId",
             populate: {
@@ -486,29 +486,27 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
         }
     });
 
-    const years = student.academicYears;
-
+    
     const departments = {};
-
-    years.forEach(year => {
-        const level = year.academicLevelId;
-        const department = level.departmentId;
-        const depId = department._id.toString();
-        const levelId = level._id.toString();
-        if (!departments[depId]) {
-            departments[depId] = {
-                ...department,
-                academicLevels: {}
-            }
+    
+    const year = student.academicYearId;
+    const level = year.academicLevelId;
+    const department = level.departmentId;
+    const depId = department._id.toString();
+    const levelId = level._id.toString();
+    if (!departments[depId]) {
+        departments[depId] = {
+            ...department,
+            academicLevels: {}
         }
-        if (!departments[depId].academicLevels[levelId]) {
-            departments[depId].academicLevels[levelId] = {
-                ...level,
-                academicYears: []
-            };
-        }
-        departments[depId].academicLevels[levelId].academicYears.push(year);
-    });
+    }
+    if (!departments[depId].academicLevels[levelId]) {
+        departments[depId].academicLevels[levelId] = {
+            ...level,
+            academicYears: []
+        };
+    }
+    departments[depId].academicLevels[levelId].academicYears.push(year);
 
     res.status(200).json({
         status: "success",
