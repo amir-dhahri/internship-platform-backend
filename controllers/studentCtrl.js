@@ -517,17 +517,4 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
     })
 })
 
-//@desc Get Academic Supervisor students
-//@route GET /api/v1/academic-supervisors/academic-years/:id
-//@access Private Academic Supervisor Only
-// exports.getStudents = AsyncHandler(async (req, res) => {
-//     const { id } = req.params;
-//     const students = await Student.find({
-//         academicYearId: id
-//     });
-//     res.status(200).json({
-//         status: "success",
-//         message: "Students fetched successfully",
-//         data: students
-//     })
-// })
+

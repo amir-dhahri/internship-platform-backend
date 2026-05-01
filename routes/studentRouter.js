@@ -1,56 +1,53 @@
 const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
-const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getAcademicYears, getStudents } = require("../controllers/academicSupervisorCtrl");
+const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
+const { getDepartments, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl } = require("../controllers/studentCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const studentRouter = express.Router();
 
-// Get Student
-studentRouter.get("/academic-years/:id", isLogin, isAcademicSupervisor, getStudents);
-
-// Get Academic Supervisor Departments
+// Get Student Departments
 studentRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
 
-// Register Academic Supervisor
-studentRouter.post("/", isLogin, isAcademicCoordinator, registerAcademicSupervisorCtrl);
+// Register Student
+studentRouter.post("/", isLogin, isAcademicSupervisor, registerStudentCtrl);
 
-// Get Academic Supervisors
-studentRouter.get("/", isLogin, isAcademicCoordinator, getstudentCtrl);
+// Get Students
+studentRouter.get("/", isLogin, isAcademicSupervisor, getStudentsCtrl);
 
-// Get Academic Supervisor Profile
-studentRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
+// Get Student Profile
+studentRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchStudentProfileCtrl);
 
-// Update Academic Supervisor Profile
-studentRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
+// Update Student Profile
+studentRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyStudentProfileCtrl);
 
-// Login Academic Supervisor
-studentRouter.post("/login", loginAcademicSupervisorCtrl);
+// Login Student
+studentRouter.post("/login", loginStudentCtrl);
 
-// Login Academic Supervisor
+// Login Student
 studentRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
 
-// Login Academic Supervisor
+// Login Student
 studentRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
 
-// Get Academic Supervisor
-studentRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
+// Get Student
+studentRouter.get("/:id", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
 
-// Update Academic Supervisor Profile
-studentRouter.put("/:id/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicSupervisorProfileCtrl);
+// Update Student Profile
+studentRouter.put("/:id/profile", isLogin, isAcademicSupervisor, upload.single("file"), updateStudentProfileCtrl);
 
-// Get Academic Supervisor Profile
-studentRouter.get("/:id/profile", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
+// Get Student Profile
+studentRouter.get("/:id/profile", isLogin, isAcademicSupervisor, getStudentsCtrl);
 
-// Delete Academic Supervisor 
-studentRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteAcademicSupervisorCtrl);
+// Delete Student 
+studentRouter.delete("/:id", isLogin, isAcademicSupervisor, deleteStudentCtrl);
 
-// Assing Academic Supervisor Academic Years
-studentRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
+// Assing Student Academic Years
+studentRouter.post("/:id/academic-years", isLogin, isAcademicSupervisor, toggleAssignAcademicYearToStudentCtrl);
 
 
 module.exports = studentRouter;
