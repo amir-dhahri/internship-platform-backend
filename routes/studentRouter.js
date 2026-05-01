@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { getDepartments, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl } = require("../controllers/studentCtrl");
+const { getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl } = require("../controllers/studentCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -33,8 +33,8 @@ studentRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
 // Login Student
 studentRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
 
-// Get Student
-studentRouter.get("/:id", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
+// Assing Student Academic Years
+studentRouter.post("/:id/academic-years", isLogin, isAcademicSupervisor, toggleAssignAcademicYearToStudentCtrl);
 
 // Update Student Profile
 studentRouter.put("/:id/profile", isLogin, isAcademicSupervisor, upload.single("file"), updateStudentProfileCtrl);
@@ -42,11 +42,13 @@ studentRouter.put("/:id/profile", isLogin, isAcademicSupervisor, upload.single("
 // Get Student Profile
 studentRouter.get("/:id/profile", isLogin, isAcademicSupervisor, getStudentsCtrl);
 
+// Get Student
+studentRouter.get("/:id", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
+
 // Delete Student 
 studentRouter.delete("/:id", isLogin, isAcademicSupervisor, deleteStudentCtrl);
 
-// Assing Student Academic Years
-studentRouter.post("/:id/academic-years", isLogin, isAcademicSupervisor, toggleAssignAcademicYearToStudentCtrl);
-
+// Get Academic Year students
+studentRouter.get("/academic-years/:id", isLogin, isAcademicSupervisor, getAcademicYearStudentCtrl);
 
 module.exports = studentRouter;

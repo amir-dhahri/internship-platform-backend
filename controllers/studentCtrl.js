@@ -244,6 +244,7 @@ exports.toggleAssignAcademicYearToStudentCtrl = AsyncHandler(async (req, res) =>
     if (!student) {
         throw new Error("Student not found");
     }
+
     const academicYear = await AcademicYear.findById(academicYearId);
 
     if (!academicYear) {
@@ -512,4 +513,17 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
     })
 })
 
-
+//@desc Get Academic Year Students
+//@route GET /api/v1/students/academic-years/:id
+//@access Private Academic Supervisor Only
+exports.getAcademicYearStudentCtrl = AsyncHandler(async (req, res) => {
+    const { id: yearId } = req.params;
+    const students = await Student.find({
+        academicYearId: yearId
+    });
+    res.status(200).send({
+        status: "success",
+        message: "Students fetched successfully",
+        data: students
+    })
+})
