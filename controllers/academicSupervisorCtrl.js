@@ -535,22 +535,28 @@ exports.getStudents = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/chat/send
 //@access Private Academic Supervisor Only
 exports.sendMessage = AsyncHandler(async (req, res) => {
-    const { text } = req.body;
-    const { id } = req.userAuth;
+    const { text, receiverId } = req.body;
+    const { id: senderId } = req.userAuth;
     const files = req.files;
     const attachments = [];
+
     if (files) {
         for (let file in files) {
             const photo = await uploadImage(file);
             attachments.push(photo);
         }
     }
+
     const message = await Message.create({
         receiverId,
-        senderId: id,
+        senderId,
         text,
         attachments
     });
+
+    const io = req.app.get("io");
+
+    io.to(receiverId.toString()).emit("message", message);
 
     res.status(200).json({
         status: "success",
@@ -564,8 +570,8 @@ exports.sendMessage = AsyncHandler(async (req, res) => {
 //@access Private Academic Supervisor Only
 exports.getMessages = AsyncHandler(async (req, res) => {
     const { receiverId } = req.body;
-    const { id } = req.userAuth;
-    const messages = await Message.find({ senderId: id, receiverId: receiverId });
+    const { id : senderId} = req.userAuth;
+    const messages = await Message.find({ senderId, receiverId});
     res.status(200).json({
         status: "success",
         message: "Messages fetched successfully",
