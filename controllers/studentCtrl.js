@@ -518,6 +518,8 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
 //@access Private Academic Supervisor Only
 exports.getAcademicYearStudentCtrl = AsyncHandler(async (req, res) => {
     const { id: yearId } = req.params;
+    console.log(yearId);
+    
     const students = await Student.find({
         academicYearId: yearId
     });
