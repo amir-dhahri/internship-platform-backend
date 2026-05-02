@@ -7,6 +7,7 @@ const AcademicYear = require("../models/AcademicYear");
 const { hashPassword, isPassMatched } = require("../utils/helpers");
 const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
+const Message = require("../models/Message");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -359,7 +360,6 @@ exports.fetchAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
 //@route PUT /api/v1/academic-supervisors/profile
 //@access Private University Supervisors 
 exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
-
     const {
         firstName,
         lastName,
@@ -484,9 +484,9 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
             }
         }
     });
-    
+
     const years = academicSupervisor.academicYears;
-    
+
     const departments = {};
 
     years.forEach(year => {
@@ -504,11 +504,11 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
             departments[depId].academicLevels[levelId] = {
                 ...level,
                 academicYears: []
-            }; 
+            };
         }
         departments[depId].academicLevels[levelId].academicYears.push(year);
     });
-    
+
     res.status(200).json({
         status: "success",
         message: "Departments fetched successfully",
@@ -528,5 +528,47 @@ exports.getStudents = AsyncHandler(async (req, res) => {
         status: "success",
         message: "Students fetched successfully",
         data: students
+    })
+})
+
+//@desc Academic Supervisor send message
+//@route POST /api/v1/academic-supervisors/chat/send
+//@access Private Academic Supervisor Only
+exports.sendMessage = AsyncHandler(async (req, res) => {
+    const { text } = req.body;
+    const { id } = req.userAuth;
+    const files = req.files;
+    const attachments = [];
+    if (files) {
+        for (let file in files) {
+            const photo = await uploadImage(file);
+            attachments.push(photo);
+        }
+    }
+    const message = await Message.create({
+        receiverId,
+        senderId: id,
+        text,
+        attachments
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Message sent successfully",
+        data: message
+    })
+})
+
+//@desc Academic Supervisor Get Messages
+//@route POST /api/v1/academic-supervisors/chat/messages
+//@access Private Academic Supervisor Only
+exports.getMessages = AsyncHandler(async (req, res) => {
+    const { receiverId } = req.body;
+    const { id } = req.userAuth;
+    const messages = await Message.find({ senderId: id, receiverId: receiverId });
+    res.status(200).json({
+        status: "success",
+        message: "Messages fetched successfully",
+        data: messages
     })
 })

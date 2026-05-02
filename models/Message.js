@@ -4,7 +4,7 @@ const messageSchema = new mongoose.Schema(
     {
         roomId: {
             type: String,
-            required: true,
+            required: false,
             index: true, // for faster queries
         },
         senderId: {
@@ -23,7 +23,6 @@ const messageSchema = new mongoose.Schema(
         attachments: [
             {
                 url: String,
-                type: String,
             },
         ],
         readBy: [
