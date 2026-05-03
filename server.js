@@ -32,6 +32,11 @@ io.on("connection", (socket) => {
     socket.join(userId);
 
     console.log("User joined room:", userId);
+    
+    socket.on("user_typing", (data) => {
+        socket.broadcast.emit("user_typing", data);
+    })
+
 
     socket.on("disconnect", () => {
         console.log("Client disconnected:", socket.id);

@@ -556,7 +556,7 @@ exports.sendMessage = AsyncHandler(async (req, res) => {
 
     const io = req.app.get("io");
 
-    io.to(receiverId.toString()).emit("message", message);
+    io.to(receiverId.toString()).emit("receive_message", message);
 
     res.status(200).json({
         status: "success",
