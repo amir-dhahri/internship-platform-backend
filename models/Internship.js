@@ -12,12 +12,20 @@ const internshipSchema = new Schema(
             type: String,
             required: false,
         },
+        image: {
+            type: String,
+            required: true
+        },
         duration: {
-            type: Number,
+            type: String,
             required: true,
         },
         startDate: {
-            type: Date,
+            type: String,
+            required: true,
+        },
+        endDate: {
+            type: String,
             required: true,
         },
         location: {
@@ -27,10 +35,6 @@ const internshipSchema = new Schema(
             type: String,
             enum: ["onsite", "remote", "hybrid"],
             default: "onsite"
-        },
-        endDate: {
-            type: Date,
-            required: true,
         },
         student: {
             type: Schema.Types.ObjectId,

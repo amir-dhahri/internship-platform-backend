@@ -602,6 +602,13 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
     if (internshipFound) {
         throw new Error("Internship already exists");
     }
+
+    const file = req.file;
+    if (file) {
+        throw new Error("Kindly attach an image.");
+    }
+    const imgURL = uploadImage(file);
+
     const internship = await Internship.create(
         {
             title,
@@ -615,6 +622,7 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
             requirements,
             status,
             type,
+            image: imgURL,
             academicSupervisor: id
         }
     )
