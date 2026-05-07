@@ -8,6 +8,7 @@ const { hashPassword, isPassMatched } = require("../utils/helpers");
 const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
 const Message = require("../models/Message");
+const Internship = require("../models/Internship");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -570,11 +571,76 @@ exports.sendMessage = AsyncHandler(async (req, res) => {
 //@access Private Academic Supervisor Only
 exports.getMessages = AsyncHandler(async (req, res) => {
     const { receiverId } = req.body;
-    const { id : senderId} = req.userAuth;
-    const messages = await Message.find({ senderId, receiverId});
+    const { id: senderId } = req.userAuth;
+    const messages = await Message.find({ senderId, receiverId });
     res.status(200).json({
         status: "success",
         message: "Messages fetched successfully",
         data: messages
+    })
+})
+
+//@desc Add internship
+//@route POST /api/v1/internships
+//@access Private University & Company Supervisors Only
+exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
+    const {
+        title,
+        description,
+        duration,
+        startDate,
+        endDate,
+        location,
+        workMode,
+        topic,
+        requirements,
+        status,
+        type
+    } = req.body;
+    const { id } = req.userAuth;
+    const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
+    if (internshipFound) {
+        throw new Error("Internship already exists");
+    }
+    const internship = await Internship.create(
+        {
+            title,
+            description,
+            duration,
+            startDate,
+            endDate,
+            location,
+            workMode,
+            topic,
+            requirements,
+            status,
+            type,
+            academicSupervisor: id
+        }
+    )
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+
+    const receivers = [id]
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: title,
+        entityType: "Internships",
+        message: `New internship "${title}" was created`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(201).json({
+        status: "success",
+        message: "Internship added successfully",
+        data: internship,
     })
 })

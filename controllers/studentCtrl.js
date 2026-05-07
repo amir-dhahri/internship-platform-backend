@@ -262,6 +262,7 @@ exports.toggleAssignAcademicYearToStudentCtrl = AsyncHandler(async (req, res) =>
     await student.save();
 
     const name = `${student.firstName} ${student.lastName}`
+    console.log("exists: ", exists);
 
     const message = exists
         ? `Student "${name}" was unassigned from academic year "${academicYear.name}".`
@@ -518,8 +519,6 @@ exports.getDepartments = AsyncHandler(async (req, res) => {
 //@access Private Academic Supervisor Only
 exports.getAcademicYearStudentCtrl = AsyncHandler(async (req, res) => {
     const { id: yearId } = req.params;
-    console.log(yearId);
-    
     const students = await Student.find({
         academicYearId: yearId
     });

@@ -1,0 +1,196 @@
+const AsyncHandler = require("express-async-handler");
+const Department = require("../models/Department");
+const AcademicLevel = require("../models/AcademicLevel");
+const University = require("../models/University");
+const AcademicCoordinator = require("../models/AcademicCoordinator");
+const { default: Notification } = require("../models/Notification");
+const Internship = require("../models/Internship");
+
+
+
+//@desc Get all internships
+//@route GET /api/v1/internships
+//@access Private University Coordinator Only
+exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const university = await University.findOne({ academicCoordinator: id });
+    const departments = await Department.find({ university: university._id });
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Departments fetched successfully",
+            data: departments,
+        }
+    );
+})
+
+//@desc Get departments statistics
+//@route GET /api/v1/departments/statistics
+//@access Private University Coordinator Only
+exports.getDepartmentsStatisticsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const university = await University.findOne({ academicCoordinator: id });
+    const departments = await Department.find({ university: university._id });
+    const departmentsCount = departments.length;
+    let activeCount = 0;
+    let inactiveCount = 0;
+    for (const department of departments) {
+        if (department.isActive) {
+            activeCount += 1
+        } else {
+            inactiveCount += 1
+        }
+    }
+    const activePercentage = ((activeCount / departmentsCount) * 100).toFixed(3);
+    const inactivePercentage = ((inactiveCount / departmentsCount) * 100).toFixed(3);
+    const statistics = {
+        activePercentage,
+        inactivePercentage,
+        departmentsCount,
+        activeCount,
+        inactiveCount,
+    }
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Departments statistics fetched successfully",
+            data: statistics,
+        }
+    );
+})
+
+//@desc Get recent departments 
+//@route GET /api/v1/departments/recent
+//@access Private University Coordinator Only
+exports.getRecentDepartmentsCtrl = AsyncHandler(async (req, res) => {
+    const { count } = req.query;
+    const { id } = req.userAuth;
+    const university = await University.findOne({ academicCoordinator: id });
+    const departments = await Department.find({ university: university._id }).sort({ createdAt: -1 }).limit(count);
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Departments fetched successfully",
+            data: departments,
+        }
+    );
+})
+
+//@desc Get department academic levels
+//@route GET /api/v1/departments/:id/academic-levels/
+//@access Private University Coordinator Only
+exports.getDepartmentAcademicLevelsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const academicLevels = await AcademicLevel.find({ departmentId: id });
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Academic levels fetched successfully",
+            data: academicLevels,
+        }
+    );
+})
+
+//@desc Get department
+//@route GET /api/v1/departments/:id
+//@access Private University Coordinator Only
+exports.getDepartmentCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const department = await Department.findById(id);
+    if (!department) {
+        throw new Error("Department Not Found!");
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Department fetched successfully",
+        data: department,
+    });
+})
+
+//@desc Update department
+//@route PUT /api/v1/departments/:id
+//@access Private University Coordinator Only
+exports.updateDepartmentCtrl = AsyncHandler(async (req, res) => {
+    const { name,
+        description,
+        isActive, } = req.body;
+    const { id } = req.params;
+    const { id: userId } = req.userAuth;
+    // If name exists
+    const university = await University.findOne({ academicCoordinator: userId });
+    const departmentExists = await Department.findOne({ name, _id: { $ne: id }, university: university._id });
+    if (departmentExists) {
+        throw new Error("Department already exists");
+    }
+    const department = await Department.findByIdAndUpdate(id,
+        {
+            name,
+            description,
+            isActive,
+        }, {
+        new: true,
+    });
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Departments",
+        message: `New department "${name}" was updated`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Department updated successfully",
+        data: department
+    })
+})
+
+//@desc Delete department
+//@route DELETE /api/v1/departments/:id
+//@access Private University Coordinator Only
+exports.deleteDepartmentCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { name } = await Department.findByIdAndDelete(id);
+
+    const { id: userId } = req.userAuth;
+
+    const academicCoordinator = await AcademicCoordinator.findById(userId);
+
+    const receivers = [userId]
+
+    const notif = await Notification.create({
+        sender: userId,
+        receivers,
+        type: "SYSTEM",
+        entity: name,
+        entityType: "Departments",
+        message: `New department "${name}" was deleted`,
+        isRead: false,
+        senderPhoto: academicCoordinator.photo
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif)
+    })
+
+    res.status(200).json({
+        status: "success",
+        message: "Department deleted successfully",
+        data: {},
+    });
+})
+

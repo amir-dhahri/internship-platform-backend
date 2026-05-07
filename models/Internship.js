@@ -35,31 +35,28 @@ const internshipSchema = new Schema(
         student: {
             type: Schema.Types.ObjectId,
             ref: "Student",
-            required: true
+            required: false
         },
         companySupervisor: {
             type: Schema.Types.ObjectId,
-            ref: "CompanySupervisor"
+            ref: "CompanySupervisor",
+            required: false
         },
         academicSupervisor: {
             type: Schema.Types.ObjectId,
-            ref: "AcademicSupervisor"
+            ref: "AcademicSupervisor",
+            required: false
         },
         topic: {
             type: String
         },
-        technologies: [{
+        requirements: [{
             type: String
         }],
         status: {
             type: String,
             enum: ["pending", "approved", "ongoing", "completed", "rejected"],
             default: "pending",
-            required: true,
-        },
-        company: {
-            type: Schema.Types.ObjectId,
-            ref: "Company",
             required: true,
         },
         type: {

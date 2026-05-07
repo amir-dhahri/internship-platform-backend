@@ -33,14 +33,14 @@ studentRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
 // Login Student
 studentRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
 
+// Get Student Profile
+studentRouter.get("/:id/profile", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
+
 // Assing Student Academic Years
 studentRouter.post("/:id/academic-years", isLogin, isAcademicSupervisor, toggleAssignAcademicYearToStudentCtrl);
 
 // Update Student Profile
 studentRouter.put("/:id/profile", isLogin, isAcademicSupervisor, upload.single("file"), updateStudentProfileCtrl);
-
-// Get Student Profile
-studentRouter.get("/:id/profile", isLogin, isAcademicSupervisor, getStudentsCtrl);
 
 // Get Student
 studentRouter.get("/:id", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
