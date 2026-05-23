@@ -1,17 +1,35 @@
 const verifyToken = require("../utils/verifyToken");
 
 const isLogin = async (req, res, next) => {
-    // const token = req.headers?.authorization?.split(" ")[1];
-    const token = req.cookies.token;
-    const verifiedToken = verifyToken(token);
-    if (verifiedToken) {
-        const id = verifiedToken.id;
-        req.userAuth = { id };
+    try {
+        // 1. Try Bearer token (React Native / API clients)
+        const authHeader = req.headers.authorization;
+        const bearerToken =
+            authHeader && authHeader.startsWith("Bearer ")
+                ? authHeader.split(" ")[1]
+                : null;
+
+        // 2. Fallback to cookie (Web)
+        const cookieToken = req.cookies?.token;
+
+        const token = bearerToken || cookieToken;
+
+        if (!token) {
+            return next(new Error("No token provided"));
+        }
+
+        const verifiedToken = verifyToken(token);
+
+        if (!verifiedToken) {
+            return next(new Error("Token expired/invalid"));
+        }
+
+        req.userAuth = { id: verifiedToken.id };
+
         next();
-    } else {
-        const err = new Error("Token expired/invalid");
-        next(err);
+    } catch (error) {
+        next(new Error("Authentication failed"));
     }
-}
+};
 
 module.exports = isLogin;
