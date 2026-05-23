@@ -140,7 +140,8 @@ exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     }
 
     const token = generateToken(academicCoordinator._id, "academic-coordinator");
-
+    console.log(token);
+    
     res.cookie('token', token, {
         httpOnly: true,
         secure: false,        // true in production (HTTPS)
