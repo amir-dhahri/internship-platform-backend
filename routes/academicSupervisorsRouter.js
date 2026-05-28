@@ -11,6 +11,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 const academicSupervisorsRouter = express.Router();
 
 
+//Get Internship
+academicSupervisorsRouter.get("/internships/get/single/:id", isLogin, isAcademicSupervisor, getInternshipCtrl);
+
+//Delete Internship
+academicSupervisorsRouter.delete("/internships/delete/:id", isLogin, isAcademicSupervisor, deleteInternshipCtrl);
+
 //Get Internships
 academicSupervisorsRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshupsCtrl)
 
