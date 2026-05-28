@@ -680,8 +680,6 @@ exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
 //@route Get /api/v1/internships/get/single/:id
 //@access Private Universitry & Company Supevisors Only
 exports.getInternshipCtrl = AsyncHandler(async (req, res) => {
-    console.log("ok");
-    
     const { id } = req.params;
     const internship = await Internship.findById(id);
     res.status(200).send({
