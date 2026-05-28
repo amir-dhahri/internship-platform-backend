@@ -587,7 +587,6 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
     const {
         title,
         description,
-        duration,
         startDate,
         endDate,
         location,
@@ -597,39 +596,50 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
         status,
         type
     } = req.body;
-    
+    console.log(startDate);
+
     const { id } = req.userAuth;
     const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
     if (internshipFound) {
         throw new Error("Internship already exists");
     }
-    
+
     const file = req.file;
-    console.log("here");
 
     if (!file) {
         throw new Error("Kindly attach an image.");
     }
-    
-    const imgURL = uploadImage(file);
 
-    const internship = await Internship.create(
-        {
-            title,
-            description,
-            duration,
-            startDate,
-            endDate,
-            location,
-            workMode,
-            topic,
-            requirements: requirementsStr ? JSON.parse(requirementsStr) : [],
-            status,
-            type,
-            image: imgURL,
-            academicSupervisor: id
-        }
-    )
+    const imgURL = await uploadImage(file);
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const durationInMonths =
+        (end.getFullYear() - start.getFullYear()) * 12 +
+        (end.getMonth() - start.getMonth());
+        console.log("Title", title);
+        
+    try {
+        const internship = await Internship.create(
+            {
+                title,
+                description,
+                duration: durationInMonths.toString(),
+                startDate,
+                endDate,
+                location,
+                workMode,
+                topic,
+                requirements: requirementsStr ? JSON.parse(requirementsStr) : [],
+                status,
+                type,
+                image: imgURL,
+                academicSupervisor: id
+            }
+        )
+    } catch (err) {
+        console.log(err);
+    }
     const academicSupervisor = await AcademicSupervisor.findById(id);
 
     const receivers = [id]
