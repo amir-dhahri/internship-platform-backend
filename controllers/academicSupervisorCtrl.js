@@ -597,6 +597,7 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
         status,
         type
     } = req.body;
+    console.log("here");
 
     const { id } = req.userAuth;
     const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
@@ -605,11 +606,11 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
     }
 
     const file = req.file;
-    console.log("file:", file);
 
     if (!file) {
         throw new Error("Kindly attach an image.");
     }
+    
     const imgURL = uploadImage(file);
 
     const internship = await Internship.create(
