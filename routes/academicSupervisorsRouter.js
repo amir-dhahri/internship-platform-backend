@@ -3,13 +3,16 @@ const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getAcademicYears, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshupsCtrl } = require("../controllers/academicSupervisorCtrl");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, getAcademicSupervisorProfileCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getAcademicYears, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshupsCtrl, uupdateInternshipCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl } = require("../controllers/academicSupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const academicSupervisorsRouter = express.Router();
 
+
+//Update Internship 
+academicSupervisorsRouter.put("/internships/update/:id", isLogin, isAcademicSupervisor, uupdateInternshipCtrl)
 
 //Get Internship
 academicSupervisorsRouter.get("/internships/get/single/:id", isLogin, isAcademicSupervisor, getInternshipCtrl);
@@ -18,7 +21,7 @@ academicSupervisorsRouter.get("/internships/get/single/:id", isLogin, isAcademic
 academicSupervisorsRouter.delete("/internships/delete/:id", isLogin, isAcademicSupervisor, deleteInternshipCtrl);
 
 //Get Internships
-academicSupervisorsRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshupsCtrl)
+academicSupervisorsRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshipsCtrl)
 
 // Add Internship
 academicSupervisorsRouter.post("/internships/add", isLogin, isAcademicSupervisor, upload.single("file"), createInternshipsCtrl);

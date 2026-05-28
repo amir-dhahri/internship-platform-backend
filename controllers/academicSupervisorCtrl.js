@@ -666,12 +666,133 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
 //@desc Get Internships
 //@route GET /api/vi/internships
 //@access Private University & Company Supervisors Only
-exports.getInternshupsCtrl = AsyncHandler(async (req, res) => {
-    const {id} = req.userAuth;
-    const internships = await Internship.find({academicSupervisor: id});
+exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const internships = await Internship.find({ academicSupervisor: id });
     res.status(200).send({
         status: "success",
         message: "Internships fetched successfully",
         data: internships,
     })
 })
+
+//@desc Get single internship
+//@route Get /api/v1/internships/get/single/:id
+//@access Private Universitry & Company Supevisors Only
+exports.getInternshipCtrl = Async(async (req, res) => {
+    const { id } = req.params;
+    const internship = await Internship.findById(id);
+    res.status(200).send({
+        status: "success",
+        message: "Internship fetched successfully",
+        data: internship,
+    })
+})
+
+//@desc Get single internship
+//@route Get /api/v1/internships/delete/:id
+//@access Private Universitry & Company Supevisors Only
+exports.deleteInternshipCtrl = Async(async (req, res) => {
+    const { id } = req.params;
+    const internship = await Internship.findOneAndDelete(id);
+    res.status(200).send({
+        status: "success",
+        message: "Internship deleted successfully",
+        data: internship,
+    })
+})
+
+//@desc Get single internship
+//@route Get /api/v1/internships/delete/:id
+//@access Private Universitry & Company Supevisors Only
+exports.updateInternshipCtrl = Async(async (req, res) => {
+    const {
+        title,
+        description,
+        startDate,
+        endDate,
+        location,
+        workMode,
+        topic,
+        requirementsStr,
+        status,
+        type,
+    } = req.body;
+
+    const { id } = req.userAuth;
+
+    const internshipFound = await Internship.findOne({
+        _id: req.params.id,
+        academicSupervisor: id,
+    });
+
+    if (!internshipFound) {
+        throw new Error("Internship not found!");
+    }
+
+    let imgURL = internshipFound.image;
+
+    const file = req.file;
+    if (file) {
+        imgURL = await uploadImage(file);
+    }
+
+    let durationInMonths = internshipFound.duration;
+
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        durationInMonths =
+            (end.getFullYear() - start.getFullYear()) * 12 +
+            (end.getMonth() - start.getMonth());
+    }
+
+    const updatedInternship = await Internship.findByIdAndUpdate(
+        req.params.id,
+        {
+            title,
+            description,
+            startDate,
+            endDate,
+            location,
+            workMode,
+            topic,
+            requirements: requirementsStr
+                ? JSON.parse(requirementsStr)
+                : internshipFound.requirements,
+            status,
+            type,
+            image: imgURL,
+            duration: durationInMonths,
+        },
+        { new: true }
+    );
+
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+
+    const receivers = [id];
+
+    const notif = await Notification.create({
+        sender: id,
+        receivers,
+        type: "SYSTEM",
+        entity: title,
+        entityType: "Internships",
+        message: `Internship "${title}" was updated`,
+        isRead: false,
+        senderPhoto: academicSupervisor.photo,
+    });
+
+    const io = req.app.get("io");
+
+    receivers.forEach((receiverId) => {
+        io.to(receiverId.toString()).emit("receiveNotification", notif);
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Internship updated successfully",
+        data: updatedInternship,
+    });
+});
