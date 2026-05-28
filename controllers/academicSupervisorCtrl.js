@@ -584,6 +584,8 @@ exports.getMessages = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/internships
 //@access Private University & Company Supervisors Only
 exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
+    console.log("Reached!");
+    
     try {
         const {
             title,
@@ -598,7 +600,8 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
             status,
             type
         } = req.body;
-    
+        console.log(requirementsStr);
+        
         const { id } = req.userAuth;
         const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
         if (internshipFound) {
