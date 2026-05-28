@@ -584,85 +584,89 @@ exports.getMessages = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/internships
 //@access Private University & Company Supervisors Only
 exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
-    const {
-        title,
-        description,
-        startDate,
-        endDate,
-        location,
-        workMode,
-        topic,
-        requirementsStr,
-        status,
-        type
-    } = req.body;
-    console.log(startDate);
-
-    const { id } = req.userAuth;
-    const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
-    if (internshipFound) {
-        throw new Error("Internship already exists");
-    }
-
-    const file = req.file;
-
-    if (!file) {
-        throw new Error("Kindly attach an image.");
-    }
-
-    const imgURL = await uploadImage(file);
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const durationInMonths =
-        (end.getFullYear() - start.getFullYear()) * 12 +
-        (end.getMonth() - start.getMonth());
-        console.log("Title", title);
-        
     try {
-        const internship = await Internship.create(
-            {
-                title,
-                description,
-                duration: durationInMonths.toString(),
-                startDate,
-                endDate,
-                location,
-                workMode,
-                topic,
-                requirements: requirementsStr ? JSON.parse(requirementsStr) : [],
-                status,
-                type,
-                image: imgURL,
-                academicSupervisor: id
-            }
-        )
+        const {
+            title,
+            description,
+            startDate,
+            endDate,
+            location,
+            workMode,
+            topic,
+            requirementsStr,
+            status,
+            type
+        } = req.body;
+
+        const { id } = req.userAuth;
+        const internshipFound = await Internship.findOne({ title, academicSupervisor: id });
+        if (internshipFound) {
+            throw new Error("Internship already exists");
+        }
+
+        const file = req.file;
+
+        if (!file) {
+            throw new Error("Kindly attach an image.");
+        }
+
+        const imgURL = await uploadImage(file);
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const durationInMonths =
+            (end.getFullYear() - start.getFullYear()) * 12 +
+            (end.getMonth() - start.getMonth());
+        console.log("Title", title);
+
+        try {
+            const internship = await Internship.create(
+                {
+                    title,
+                    description,
+                    duration: durationInMonths.toString(),
+                    startDate,
+                    endDate,
+                    location,
+                    workMode,
+                    topic,
+                    requirements: requirementsStr ? JSON.parse(requirementsStr) : [],
+                    status,
+                    type,
+                    image: imgURL,
+                    academicSupervisor: id
+                }
+            )
+        } catch (err) {
+            console.log(err);
+        }
+
+        const academicSupervisor = await AcademicSupervisor.findById(id);
+
+        const receivers = [id]
+
+        const notif = await Notification.create({
+            sender: id,
+            receivers,
+            type: "SYSTEM",
+            entity: title,
+            entityType: "Internships",
+            message: `New internship "${title}" was created`,
+            isRead: false,
+            senderPhoto: academicSupervisor.photo
+        });
+        const io = req.app.get("io");
+
+        receivers.forEach((receiverId) => {
+            io.to(receiverId.toString()).emit("receiveNotification", notif)
+        })
+
+        res.status(201).json({
+            status: "success",
+            message: "Internship added successfully",
+            data: internship,
+        })
     } catch (err) {
         console.log(err);
     }
-    const academicSupervisor = await AcademicSupervisor.findById(id);
-
-    const receivers = [id]
-
-    const notif = await Notification.create({
-        sender: id,
-        receivers,
-        type: "SYSTEM",
-        entity: title,
-        entityType: "Internships",
-        message: `New internship "${title}" was created`,
-        isRead: false,
-        senderPhoto: academicSupervisor.photo
-    });
-    const io = req.app.get("io");
-
-    receivers.forEach((receiverId) => {
-        io.to(receiverId.toString()).emit("receiveNotification", notif)
-    })
-
-    res.status(201).json({
-        status: "success",
-        message: "Internship added successfully",
-        data: internship,
-    })
 })
