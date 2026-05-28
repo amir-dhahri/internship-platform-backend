@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const academicSupervisorsRouter = express.Router();
 
 // 
-academicSupervisorsRouter.post("/internships/add", isLogin, isAcademicSupervisor, createInternshipsCtrl);
+academicSupervisorsRouter.post("/internships/add", isLogin, isAcademicSupervisor, upload.single("file"), createInternshipsCtrl);
 // Send Message
 academicSupervisorsRouter.post("/chat/messages/send", isLogin, isAcademicSupervisor, sendMessage);
 
