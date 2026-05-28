@@ -34,6 +34,7 @@ academicSupervisorsRouter.post("/", isLogin, isAcademicCoordinator, registerAcad
 
 // Get Academic Supervisors
 academicSupervisorsRouter.get("/", isLogin, isAcademicCoordinator, getAcademicSupervisorsCtrl);
+
 // Get Academic Supervisor Profile
 academicSupervisorsRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
 
