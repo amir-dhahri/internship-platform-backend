@@ -679,7 +679,9 @@ exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
 //@desc Get single internship
 //@route Get /api/v1/internships/get/single/:id
 //@access Private Universitry & Company Supevisors Only
-exports.getInternshipCtrl = Async(async (req, res) => {
+exports.getInternshipCtrl = AsyncHandler(async (req, res) => {
+    console.log("ok");
+    
     const { id } = req.params;
     const internship = await Internship.findById(id);
     res.status(200).send({
@@ -692,7 +694,7 @@ exports.getInternshipCtrl = Async(async (req, res) => {
 //@desc Get single internship
 //@route Get /api/v1/internships/delete/:id
 //@access Private Universitry & Company Supevisors Only
-exports.deleteInternshipCtrl = Async(async (req, res) => {
+exports.deleteInternshipCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.params;
     const internship = await Internship.findOneAndDelete(id);
     res.status(200).send({
@@ -705,7 +707,7 @@ exports.deleteInternshipCtrl = Async(async (req, res) => {
 //@desc Get single internship
 //@route Get /api/v1/internships/delete/:id
 //@access Private Universitry & Company Supevisors Only
-exports.updateInternshipCtrl = Async(async (req, res) => {
+exports.updateInternshipCtrl = AsyncHandler(async (req, res) => {
     const {
         title,
         description,
