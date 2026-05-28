@@ -12,7 +12,7 @@ const academicSupervisorsRouter = express.Router();
 
 
 //Get Internships
-academicSupervisorsRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshupsCtrl)    
+academicSupervisorsRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshupsCtrl)
 
 // Add Internship
 academicSupervisorsRouter.post("/internships/add", isLogin, isAcademicSupervisor, upload.single("file"), createInternshipsCtrl);
