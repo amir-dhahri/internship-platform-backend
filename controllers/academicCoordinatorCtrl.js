@@ -124,7 +124,9 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
 //@access Private Academic Coordinator Only
 exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
+    console.log(email);
+    console.log(password);
+    
     const academicCoordinator = await AcademicCoordinator.findOne({ email });
 
     // Check if email exists
