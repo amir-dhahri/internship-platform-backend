@@ -12,12 +12,7 @@ const academicSupervisorsRouter = express.Router();
 
 
 //Update Internship 
-try {
-    academicSupervisorsRouter.put("/internships/update/:id", isLogin, isAcademicSupervisor, upload.single("file"), updateInternshipCtrl)
-} catch(err) {
-    console.log(err);
-    
-}
+academicSupervisorsRouter.put("/internships/update/:id", isLogin, isAcademicSupervisor, upload.single("file"), updateInternshipCtrl)
 
 //Get Internship
 academicSupervisorsRouter.get("/internships/get/single/:id", isLogin, isAcademicSupervisor, getInternshipCtrl);
