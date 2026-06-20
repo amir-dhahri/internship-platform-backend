@@ -437,7 +437,6 @@ exports.modifyAcademicSupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     })
 })
 
-
 //@desc Get all notifications 
 //@route GET /api/v1/academic-supervisors/notifications
 //@access  Private Academic Supervisor Only
@@ -670,6 +669,7 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
 exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const internships = await Internship.find({ academicSupervisor: id });
+    console.log("Internships: ", internships);
     res.status(200).send({
         status: "success",
         message: "Internships fetched successfully",
