@@ -2,36 +2,36 @@ const express = require("express");
 const multer = require("multer");
 const { registerUniversityCtrl, getUniversityCtrl, registerAcademicCoordinatorCtrl, loginAcademicCoordinatorCtrl, getAcademicCoordinatorProfileCtrl, updateAcademicCoordinatorProfileCtrl, createNotificationCtrl, getNotificationsCtrl, logoutCtrl } = require("../controllers/academicCoordinatorCtrl");
 const isLogin = require("../middlewares/isLogin");
-const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
+const isCompanyCoordinator = require("../middlewares/isCompanyCoordinator");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const companyCoordinatorRouter = express.Router();
 
-// Register Academic Coordinator
+// Register Company Coordinator
 companyCoordinatorRouter.post("/register", registerAcademicCoordinatorCtrl);
 
-// login Academic Coordinator
+// login Company Coordinator
 companyCoordinatorRouter.post("/login", loginAcademicCoordinatorCtrl);
 
-//Update academic coordinator profile
-companyCoordinatorRouter.put("/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicCoordinatorProfileCtrl)
+//Update Company coordinator profile
+companyCoordinatorRouter.put("/profile", isLogin, isCompanyCoordinator, upload.single("file"), updateAcademicCoordinatorProfileCtrl)
 
-// Get academic Coordinator Profile
-companyCoordinatorRouter.get("/profile", isLogin, isAcademicCoordinator, getAcademicCoordinatorProfileCtrl);
+// Get Company Coordinator Profile
+companyCoordinatorRouter.get("/profile", isLogin, isCompanyCoordinator, getAcademicCoordinatorProfileCtrl);
 
-// Get University
-companyCoordinatorRouter.get("/university", isLogin, isAcademicCoordinator, getUniversityCtrl);
+// Get Company
+companyCoordinatorRouter.get("/company", isLogin, isCompanyCoordinator, getUniversityCtrl);
 
-// Register University
-companyCoordinatorRouter.post("/register/university", isLogin, isAcademicCoordinator, upload.single("file"), registerUniversityCtrl)
+// Register Company
+companyCoordinatorRouter.post("/register/company", isLogin, isCompanyCoordinator, upload.single("file"), registerUniversityCtrl)
 
 // Get All Notifications
-companyCoordinatorRouter.get("/notifications", isLogin, isAcademicCoordinator, getNotificationsCtrl)
+companyCoordinatorRouter.get("/notifications", isLogin, isCompanyCoordinator, getNotificationsCtrl)
 
 // Academic Coordinator Log out
-companyCoordinatorRouter.post("/logout", isLogin, isAcademicCoordinator, logoutCtrl);
+companyCoordinatorRouter.post("/logout", isLogin, isCompanyCoordinator, logoutCtrl);
 
 module.exports = companyCoordinatorRouter; 
 

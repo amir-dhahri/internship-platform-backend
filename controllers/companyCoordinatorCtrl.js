@@ -1,30 +1,29 @@
 const AsyncHandler = require("express-async-handler");
-const AcademicSupervisor = require("../models/AcademicSupervisor");
 const { hashPassword, isPassMatched } = require("../utils/helpers");
-const University = require("../models/University");
+const Company = require("../models/Company");
 const { uploadImage } = require("../utils/cloudinary");
-const AcademicCoordinator = require("../models/AcademicCoordinator");
 const generateToken = require("../utils/generateToken");
 const { default: Notification } = require("../models/Notification");
+const CompanyCoordinator = require("../models/CompanyCoordinator");
 
 
-//@desc Register academic coordinator
-//@route POST /api/v1/academic-coordinators/register
-//@access Private Academic Coordinator Only
-exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
+//@desc Register company coordinator
+//@route POST /api/v1/company-coordinators/register
+//@access Private Company Coordinator Only
+exports.registerCompanyCoordinatorCtrl = AsyncHandler(async (req, res) => {
     const {
         name,
         email,
         password,
     } = req.body;
 
-    const academicCoordinatorFound = await AcademicCoordinator.findOne({ email });
-    if (academicCoordinatorFound) {
-        throw new Error("Academic coordinator already exists");
+    const companyCoordinatorFound = await CompanyCoordinator.findOne({ email });
+    if (companyCoordinatorFound) {
+        throw new Error("Company coordinator already exists");
     }
     const firstName = name.split(" ")[0];
     const lastName = name.split(" ")[1];
-    const academicCoordinator = await AcademicCoordinator.create(
+    const companyCoordinator = await CompanyCoordinator.create(
         {
             firstName,
             lastName,
@@ -34,15 +33,15 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     )
     res.status(201).json({
         status: "success",
-        message: "Academic coordinator registered successfully",
-        data: academicCoordinator,
+        message: "Company coordinator registered successfully",
+        data: companyCoordinator,
     })
 })
 
-//@desc Update academic coordinator profile
-//@route PUT /api/v1/academic-coordinators/profile
-//@acces Private Academic Coordinator Only
-exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
+//@desc Update company coordinator profile
+//@route PUT /api/v1/company-coordinators/profile
+//@acces Private Company Coordinator Only
+exports.updateCompanyCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,
         lastName,
@@ -61,9 +60,9 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
 
     const { id } = req.userAuth;
 
-    const academicCoordinatorFound = await AcademicCoordinator.findOne({ email, _id: { $ne: id } });
-    if (academicCoordinatorFound) {
-        throw new Error("Academic coordinator credentials already exist")
+    const companyCoordinatorFound = await CompanyCoordinator.findOne({ email, _id: { $ne: id } });
+    if (companyCoordinatorFound) {
+        throw new Error("Company coordinator credentials already exist")
     }
 
     const file = req.file;
@@ -72,7 +71,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         photo = await uploadImage(file);
     }
 
-    const academicCoordinator = await AcademicCoordinator.findByIdAndUpdate(id, {
+    const companyCoordinator = await CompanyCoordinator.findByIdAndUpdate(id, {
         firstName,
         lastName,
         phone,
@@ -91,7 +90,7 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         new: true
     });
 
-    const name = `${academicCoordinator.firstName} ${academicCoordinator.lastName}`
+    const name = `${companyCoordinator.firstName} ${companyCoordinator.lastName}`
 
     const receivers = [id]
 
@@ -100,10 +99,10 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
         receivers,
         type: "SYSTEM",
         entity: name,
-        entityType: "Academic Coordinators",
-        message: `Academic coordinator "${name}" profile was updated`,
+        entityType: "Company Coordinators",
+        message: `Company coordinator "${name}" profile was updated`,
         isRead: false,
-        senderPhoto: academicCoordinator.photo
+        senderPhoto: companyCoordinator.photo
     });
 
     const io = req.app.get("io");
@@ -114,34 +113,34 @@ exports.updateAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => 
 
     res.status(200).json({
         status: "success",
-        message: "Academic coordinator profile updated successfully",
-        data: academicCoordinator,
+        message: "Company coordinator profile updated successfully",
+        data: companyCoordinator,
     })
 })
 
-//@desc Login academic coordinator
-//@route POST /api/v1/academic-coordinators/login
-//@access Private Academic Coordinator Only
-exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
+//@desc Login compnay coordinator
+//@route POST /api/v1/compnay-coordinators/login
+//@access Private Compnay Coordinator Only
+exports.loginCompanyCoordinatorCtrl = AsyncHandler(async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
     console.log(password);
     
-    const academicCoordinator = await AcademicCoordinator.findOne({ email });
+    const companyCoordinator = await CompanyCoordinator.findOne({ email });
 
     // Check if email exists
 
-    if (!academicCoordinator) {
+    if (!companyCoordinator) {
         throw new Error("Invalid login credentials");
     }
 
-    const isMatched = await isPassMatched(password, academicCoordinator.password);
+    const isMatched = await isPassMatched(password, companyCoordinator.password);
 
     if (!isMatched) {
         throw new Error("Invalid login credentials");
     }
 
-    const token = generateToken(academicCoordinator._id, "academic-coordinator");
+    const token = generateToken(companyCoordinator._id, "company-coordinator");
     console.log(token);
     
     res.cookie('token', token, {
@@ -154,46 +153,46 @@ exports.loginAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
     res.status(200)
         .json({
             status: "success",
-            message: "Academic coordinator logged in successfully",
+            message: "Company coordinator logged in successfully",
             // data: token
         })
 })
 
-//@desc Get academic coordinator profile
-//@route GET /api/v1/academic-coordinators/profile
-//@access Private Academic Coordinator Only
-exports.getAcademicCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
+//@desc Get company coordinator profile
+//@route GET /api/v1/company-coordinators/profile
+//@access Private Company Coordinator Only
+exports.getCompanyCoordinatorProfileCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
-    const academicCoordinator = await AcademicCoordinator.findById(id).select(
+    const companyCoordinator = await CompanyCoordinator.findById(id).select(
         "-password -createdAt -updatedAt"
     );
-    if (!academicCoordinator) {
-        throw new Error("Academic coordinator Not Found!");
+    if (!companyCoordinator) {
+        throw new Error("Company coordinator Not Found!");
     }
     res.status(200).json({
         status: "success",
-        message: "Academic coordinator profile fetched successfully",
-        data: academicCoordinator,
+        message: "Company coordinator profile fetched successfully",
+        data: companyCoordinator,
     });
 })
 
-//@desc Get university
-//@route GET /api/v1/academic-coordinators/univertsity
-//@access Private Academic Coordinator Only
-exports.getUniversityCtrl = AsyncHandler(async (req, res) => {
+//@desc Get company
+//@route GET /api/v1/company-coordinators/company
+//@access Private Company Coordinator Only
+exports.getCompanyCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
-    const university = await University.findOne({ academicCoordinator: id });
+    const company = await Company.findOne({ companyCoordinator: id });
     res.status(200).json({
         status: "success",
-        message: "Academic supervisor registered successfully",
-        data: university,
+        message: "Company supervisor registered successfully",
+        data: company,
     })
 })
 
-//@desc Register university
-//@route POST /api/v1/academic-coordinators/register/university
-//@access Private Academic Coordinator Only
-exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
+//@desc Register company
+//@route POST /api/v1/company-coordinators/register/company
+//@access Private Company Coordinator Only
+exports.registerCompanyCtrl = AsyncHandler(async (req, res) => {
     const {
         name,
         description,
@@ -206,13 +205,13 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
         postalCode,
     } = req.body;
     const { id } = req.userAuth;
-    const universityFound = await University.findOne({ name, academicCoordinator: id });
-    if (universityFound) {
-        throw new Error("University already exists");
+    const companyFound = await Company.findOne({ name, academicCoordinator: id });
+    if (companyFound) {
+        throw new Error("Company already exists");
     }
     const file = req.file;
     const logo = await uploadImage(file)
-    const university = await University.create(
+    const company = await Company.create(
         {
             name,
             description,
@@ -224,11 +223,11 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
             country,
             postalCode,
             logo,
-            academicCoordinator: id
+            companyCoordinator: id
         }
     )
 
-    const academicCoordinator = await AcademicCoordinator.findById(id);
+    const companyCoordinator = await CompanyCoordinator.findById(id);
 
     const receivers = [id]
 
@@ -237,10 +236,10 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
         receivers,
         type: "SYSTEM",
         entity: name,
-        entityType: "University",
-        message: `New university "${name}" was registered`,
+        entityType: "Company",
+        message: `New company "${name}" was registered`,
         isRead: false,
-        senderPhoto: academicCoordinator.photo
+        senderPhoto: companyCoordinator.photo
     });
     const io = req.app.get("io");
 
@@ -250,14 +249,14 @@ exports.registerUniversityCtrl = AsyncHandler(async (req, res) => {
 
     res.status(201).json({
         status: "success",
-        message: "University registered successfully",
-        data: university,
+        message: "Company registered successfully",
+        data: company,
     })
 })
 
 //@desc Get all notifications 
-//@route GET /api/v1/academic-coordinators/notifications
-//@access  Private Academic Coordinator Only
+//@route GET /api/v1/company-coordinators/notifications
+//@access  Private Company Coordinator Only
 exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const notifications = await Notification.find({
@@ -270,9 +269,9 @@ exports.getNotificationsCtrl = AsyncHandler(async (req, res) => {
     })
 })
 
-//@desc Logout Academic Coordinator
-//@route GET /api/v1/academic-coordinators/logout
-//@access  Private Academic Coordinator Only
+//@desc Logout Company Coordinator
+//@route GET /api/v1/company-coordinators/logout
+//@access  Private Company Coordinator Only
 exports.logoutCtrl = AsyncHandler(async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
