@@ -19,7 +19,7 @@ exports.registerStudentCtrl = AsyncHandler(async (req, res) => {
         email,
         password
     } = req.body;
-
+    const { id } = req.userAuth;
     const studentFound = await Student.findOne({ email });
 
     if (studentFound) {
@@ -31,12 +31,10 @@ exports.registerStudentCtrl = AsyncHandler(async (req, res) => {
             firstName,
             lastName,
             email,
+            academicSupervisorId: id,
             password: await hashPassword(password),
         }
     )
-
-    const { id } = req.userAuth;
-
     const academicSupervisor = await AcademicSupervisor.findById(id);
 
     const receivers = [id]

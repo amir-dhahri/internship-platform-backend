@@ -72,6 +72,11 @@ const studentSchema = new Schema(
             type: String,
             default: "#"
         },
+        academicSupervisorId: {
+            type: Schema.Types.ObjectId,
+            ref: "AcademicSupervisor",
+            required: true
+        },
         role: {
             type: String,
             default: "student"

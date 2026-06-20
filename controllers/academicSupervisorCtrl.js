@@ -797,3 +797,18 @@ exports.updateInternshipCtrl = AsyncHandler(async (req, res) => {
         data: updatedInternship,
     });
 });
+
+//@desc Get Academic Supervisor Students
+//@route GET /api/v1/academic-supervisors/students/
+//@access Private Academic Supervisor Only
+exports.getAcademicSupervisorStudentsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const students = await Student.find({
+        academicSupervisorId: id
+    });
+    res.status(200).send({
+        status: "success",
+        message: "Students fetched successfully",
+        data: students
+    })
+})
