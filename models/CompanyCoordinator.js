@@ -9,56 +9,68 @@ const companyCoordinatorSchema = new Schema(
             required: true,
             trim: true
         },
-        middlename: {
-            type: String,
-            required: false,
-            trim: true
-        },
         lastName: {
             type: String,
             required: true,
             trim: true
         },
-
         email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true
         },
-
         password: {
             type: String,
             required: true,
         },
-        role: {
-            type: String,
-            default: "student",
-        },
-
         phone: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         photo: {
-            type: String
+            type: String,
+            default: "#"
         },
-
+        bio: {
+            type: String,
+            default: "#"
+        },
         address: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         city: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         country: {
             type: String,
-            default: "Tunisia"
+            default: "#"
+        },
+        postalCode: {
+            type: String,
+            default: "#"
+        },
+        facebook: {
+            type: String,
+            default: "#"
+        },
+        x: {
+            type: String,
+            default: "#"
+        },
+        linkedin: {
+            type: String,
+            default: "#"
+        },
+        instagram: {
+            type: String,
+            default: "#"
         },
         role: {
             type: String,
-            default: "company-coordinator",
+            default: "company-coordinator"
         },
     },
     {

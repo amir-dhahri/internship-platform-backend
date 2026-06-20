@@ -669,7 +669,6 @@ exports.createInternshipsCtrl = AsyncHandler(async (req, res) => {
 exports.getInternshipsCtrl = AsyncHandler(async (req, res) => {
     const { id } = req.userAuth;
     const internships = await Internship.find({ academicSupervisor: id });
-    console.log("Internships: ", internships);
     res.status(200).send({
         status: "success",
         message: "Internships fetched successfully",

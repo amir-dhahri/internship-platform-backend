@@ -9,57 +9,76 @@ const companySupervisorSchema = new Schema(
             required: true,
             trim: true
         },
-        middlename: {
-            type: String,
-            required: false,
-            trim: true
-        },
         lastName: {
             type: String,
             required: true,
             trim: true
         },
-
         email: {
             type: String,
             required: true,
             unique: true,
             lowercase: true
         },
-
         password: {
             type: String,
             required: true,
         },
-        role: {
+        bio: {
             type: String,
-            default: "student",
+            default: "#"
         },
-
         phone: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         photo: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         address: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         city: {
-            type: String
+            type: String,
+            default: "#"
         },
-
         country: {
             type: String,
-            default: "Tunisia"
+            default: "#"
         },
+        postalCode: {
+            type: String,
+            default: "#"
+        },
+        facebook: {
+            type: String,
+            default: "#"
+        },
+        x: {
+            type: String,
+            default: "#"
+        },
+        linkedin: {
+            type: String,
+            default: "#"
+        },
+        instagram: {
+            type: String,
+            default: "#"
+        },
+        departments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Department",
+                required: false
+            }
+        ],
         role: {
             type: String,
             default: "company-supervisor"
-        },
+        }
     },
     {
         timestamps: true,
