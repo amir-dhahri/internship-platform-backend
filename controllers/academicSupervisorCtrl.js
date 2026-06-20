@@ -475,6 +475,7 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
 //@route GET /api/v1/academic-supervisors/departments
 //@access Private Academic Supervisor Only
 exports.getDepartments = AsyncHandler(async (req, res) => {
+
     const { id } = req.userAuth;
     const academicSupervisor = await AcademicSupervisor.findById(id).populate({
         path: "academicYears",
