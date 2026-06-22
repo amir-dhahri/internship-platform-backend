@@ -1,79 +1,76 @@
 const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
-const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
-const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl, updateInternshipCtrl, getAcademicSupervisorStudentsCtrl } = require("../controllers/companySupervisorCtrl");
+const isCompanySupervisor = require("../middlewares/isCompanySupervisor");
+const { updateInternshipCtrl, getInternshipCtrl, deleteInternshipCtrl, createInternshipsCtrl, sendMessage, getMessages, getDepartments, getCompanySupervisorsCtrl, fetchCompanySupervisorProfileCtrl, modifyCompanySupervisorProfileCtrl, loginCompanySupervisorCtrl, getCompanySupervisorCtrl, updateCompanySupervisorProfileCtrl, deleteCompanySupervisorCtrl, toggleAssignDepartmentsToSupervisorCtrl, registerCompanySupervisorCtrl, getInternshipsCtrl } = require("../controllers/companySupervisorCtrl");
+const isCompanyCoordinator = require("../middlewares/isCompanyCoordinator");
+const { logoutCtrl, getNotificationsCtrl } = require("../controllers/companyCoordinatorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const companySupervisorRouter = express.Router();
 
-//Get Students 
-companySupervisorRouter.get("/students", isLogin, isAcademicSupervisor, getAcademicSupervisorStudentsCtrl);
+
 //Update Internship 
-companySupervisorRouter.put("/internships/update/:id", isLogin, isAcademicSupervisor, upload.single("file"), updateInternshipCtrl)
+companySupervisorRouter.put("/internships/update/:id", isLogin, isCompanySupervisor, upload.single("file"), updateInternshipCtrl)
 
 //Get Internship
-companySupervisorRouter.get("/internships/get/single/:id", isLogin, isAcademicSupervisor, getInternshipCtrl);
+companySupervisorRouter.get("/internships/get/single/:id", isLogin, isCompanySupervisor, getInternshipsCtrl);
 
 //Delete Internship
-companySupervisorRouter.delete("/internships/delete/:id", isLogin, isAcademicSupervisor, deleteInternshipCtrl);
+companySupervisorRouter.delete("/internships/delete/:id", isLogin, isCompanySupervisor, deleteInternshipCtrl);
 
 //Get Internships
-companySupervisorRouter.get("/internships/get", isLogin, isAcademicSupervisor, getInternshipsCtrl)
+companySupervisorRouter.get("/internships/get", isLogin, isCompanySupervisor, getInternshipsCtrl)
 
 // Add Internship
-companySupervisorRouter.post("/internships/add", isLogin, isAcademicSupervisor, upload.single("file"), createInternshipsCtrl);
+companySupervisorRouter.post("/internships/add", isLogin, isCompanySupervisor, upload.single("file"), createInternshipsCtrl);
 
 // Send Message
-companySupervisorRouter.post("/chat/messages/send", isLogin, isAcademicSupervisor, sendMessage);
+companySupervisorRouter.post("/chat/messages/send", isLogin, isCompanySupervisor, sendMessage);
 
 // Get Messages
-companySupervisorRouter.get("/chat/messages", isLogin, isAcademicSupervisor, getMessages);
+companySupervisorRouter.get("/chat/messages", isLogin, isCompanySupervisor, getMessages);
 
-// Get Student
-companySupervisorRouter.get("/academic-years/:id", isLogin, isAcademicSupervisor, getStudents);
+// Get Company Supervisor Departments
+companySupervisorRouter.get("/departments", isLogin, isCompanySupervisor, getDepartments);
 
-// Get Academic Supervisor Departments
-companySupervisorRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
+// Register Company Supervisor
+companySupervisorRouter.post("/", isLogin, isCompanyCoordinator, registerCompanySupervisorCtrl);
 
-// Register Academic Supervisor
-companySupervisorRouter.post("/", isLogin, isAcademicCoordinator, registerAcademicSupervisorCtrl);
+// Get Company Supervisors
+companySupervisorRouter.get("/", isLogin, isCompanyCoordinator, getCompanySupervisorsCtrl);
 
-// Get Academic Supervisors
-companySupervisorRouter.get("/", isLogin, isAcademicCoordinator, getAcademicSupervisorsCtrl);
+// Get Company Supervisor Profile
+companySupervisorRouter.get("/fetch/profile", isLogin, isCompanySupervisor, fetchCompanySupervisorProfileCtrl);
 
-// Get Academic Supervisor Profile
-companySupervisorRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchAcademicSupervisorProfileCtrl);
+// Update Company Supervisor Profile
+companySupervisorRouter.put("/modify/profile", isLogin, isCompanySupervisor, upload.single("file"), modifyCompanySupervisorProfileCtrl);
 
-// Update Academic Supervisor Profile
-companySupervisorRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyAcademicSupervisorProfileCtrl);
+// Login Company Supervisor
+companySupervisorRouter.post("/login", loginCompanySupervisorCtrl);
 
-// Login Academic Supervisor
-companySupervisorRouter.post("/login", loginAcademicSupervisorCtrl);
+// Logout Company Supervisor
+companySupervisorRouter.post("/logout", isLogin, isCompanySupervisor, logoutCtrl);
 
-// Login Academic Supervisor
-companySupervisorRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
+// Fech Company Supervisor Notificaiotns
+companySupervisorRouter.get("/notifications", isLogin, isCompanySupervisor, getNotificationsCtrl);
 
-// Login Academic Supervisor
-companySupervisorRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
+// Get Company Supervisor
+companySupervisorRouter.get("/:id", isLogin, isCompanyCoordinator, getCompanySupervisorCtrl);
 
-// Get Academic Supervisor
-companySupervisorRouter.get("/:id", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
+// Update Company Supervisor Profile
+companySupervisorRouter.put("/:id/profile", isLogin, isCompanyCoordinator, upload.single("file"), updateCompanySupervisorProfileCtrl);
 
-// Update Academic Supervisor Profile
-companySupervisorRouter.put("/:id/profile", isLogin, isAcademicCoordinator, upload.single("file"), updateAcademicSupervisorProfileCtrl);
+// Get Company Supervisor Profile
+companySupervisorRouter.get("/:id/profile", isLogin, isCompanyCoordinator, getCompanySupervisorCtrl);
 
-// Get Academic Supervisor Profile
-companySupervisorRouter.get("/:id/profile", isLogin, isAcademicCoordinator, getAcademicSupervisorCtrl);
+// Delete Company Supervisor 
+companySupervisorRouter.delete("/:id", isLogin, isCompanyCoordinator, deleteCompanySupervisorCtrl);
 
-// Delete Academic Supervisor 
-companySupervisorRouter.delete("/:id", isLogin, isAcademicCoordinator, deleteAcademicSupervisorCtrl);
-
-// Assing Academic Supervisor Academic Years
-companySupervisorRouter.post("/:id/academic-years", isLogin, isAcademicCoordinator, toggleAssignAcademicYearToSupervisorCtrl);
+// Assing Company Supervisor Departments
+companySupervisorRouter.post("/:id/departments", isLogin, isCompanyCoordinator, toggleAssignDepartmentsToSupervisorCtrl);
 
 
 

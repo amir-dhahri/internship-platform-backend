@@ -15,7 +15,7 @@ companyCoordinatorRouter.post("/register", registerCompanyCoordinatorCtrl);
 // login Company Coordinator
 companyCoordinatorRouter.post("/login", loginCompanyCoordinatorCtrl);
 
-//Update Company coordinator profile
+// Update Company coordinator profile
 companyCoordinatorRouter.put("/profile", isLogin, isCompanyCoordinator, upload.single("file"), updateCompanyCoordinatorProfileCtrl)
 
 // Get Company Coordinator Profile
@@ -30,7 +30,7 @@ companyCoordinatorRouter.post("/register/company", isLogin, isCompanyCoordinator
 // Get All Notifications
 companyCoordinatorRouter.get("/notifications", isLogin, isCompanyCoordinator, getNotificationsCtrl)
 
-// Academic Coordinator Log out
+// Company Coordinator Log out
 companyCoordinatorRouter.post("/logout", isLogin, isCompanyCoordinator, logoutCtrl);
 
 module.exports = companyCoordinatorRouter;
