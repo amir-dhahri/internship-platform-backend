@@ -22,6 +22,10 @@ const departmentSchema = new mongoose.Schema(
         university: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "University"
+        },
+        company: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Company"
         }
     },
     {

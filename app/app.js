@@ -12,6 +12,7 @@ const academicSupervisorsRouter = require("../routes/academicSupervisorsRouter")
 const studentRouter = require("../routes/studentRouter");
 const companyCoordinatorRouter = require("../routes/companyCoordinatorsRouter");
 const companySupervisorRouter = require("../routes/companySupervisorsRouter");
+const companyDepartmentRouter = require("../routes/companyDepartmentRouter");
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/v1/academic-supervisors", academicSupervisorsRouter)
 app.use("/api/v1/students", studentRouter)
 app.use("/api/v1/company-coordinators", companyCoordinatorRouter);
 app.use("/api/v1/company-supervisors", companySupervisorRouter);
+app.use("/api/v1/departments/company", companyDepartmentRouter)
 //=====Error Middlewares=====//
 app.use(notFoundError);
 app.use(globalErrHandler);
