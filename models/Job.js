@@ -33,7 +33,7 @@ const internshipSchema = new Schema(
         },
         workMode: {
             type: String,
-            enum: ["onsite", "remote", "hybrid"],
+            enum: ["onsite", "remote", "hybrid", "freelance", "part-time-onsite"],
             default: "onsite"
         },
         student: {
@@ -46,26 +46,12 @@ const internshipSchema = new Schema(
             ref: "CompanySupervisor",
             required: false
         },
-        academicSupervisor: {
-            type: Schema.Types.ObjectId,
-            ref: "AcademicSupervisor",
-            required: false
-        },
-        topic: {
+        poste: {
             type: String
         },
         requirements: [{
             type: String,
-            enum: ["student",
-                "degree",
-                "cv",
-                "cover_letter",
-                "project",
-                "portfolio",
-                "web_skills",
-                "teamwork",
-                "communication",
-                "availability",]
+            enum: ["diploma", "experience", "internship_experience", "teamwork", "autonomy", "communication", "technical_skills", "languages", "problem_solving", "portfolio"],
         }],
         status: {
             type: String,
@@ -75,8 +61,8 @@ const internshipSchema = new Schema(
         },
         type: {
             type: String,
-            enum: ["summer", "end-of-study", "part-time"],
-            default: "end-of-study",
+            enum: ["cdi", "cdd", "stage", "alternance", "freelance", "saisonnier", "temps-partiel"],
+            default: "cdi",
             required: true,
         },
     },

@@ -16,7 +16,7 @@ const companySupervisorRouter = express.Router();
 companySupervisorRouter.put("/internships/update/:id", isLogin, isCompanySupervisor, upload.single("file"), updateInternshipCtrl)
 
 //Get Internship
-companySupervisorRouter.get("/internships/get/single/:id", isLogin, isCompanySupervisor, getInternshipsCtrl);
+companySupervisorRouter.get("/internships/get/single/:id", isLogin, isCompanySupervisor, getInternshipCtrl);
 
 //Delete Internship
 companySupervisorRouter.delete("/internships/delete/:id", isLogin, isCompanySupervisor, deleteInternshipCtrl);
