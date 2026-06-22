@@ -196,6 +196,8 @@ exports.updateDepartmentCtrl = AsyncHandler(async (req, res) => {
 //@route DELETE /api/v1/departments/company/:id
 //@access Private Company Coordinator Only
 exports.deleteDepartmentCtrl = AsyncHandler(async (req, res) => {
+    console.log("ok");
+    
     const { id } = req.params;
     const { name } = await Department.findByIdAndDelete(id);
 
