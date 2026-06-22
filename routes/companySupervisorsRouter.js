@@ -3,7 +3,7 @@ const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl, updateInternshipCtrl, getAcademicSupervisorStudentsCtrl } = require("../controllers/academicSupervisorCtrl");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl, updateInternshipCtrl, getAcademicSupervisorStudentsCtrl } = require("../controllers/companySupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 

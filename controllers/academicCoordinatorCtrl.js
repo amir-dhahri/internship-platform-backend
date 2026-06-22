@@ -18,6 +18,7 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
         password,
     } = req.body;
 
+    
     const academicCoordinatorFound = await AcademicCoordinator.findOne({ email });
     if (academicCoordinatorFound) {
         throw new Error("Academic coordinator already exists");
