@@ -1,5 +1,5 @@
 const express = require("express");
-const { getDepartmentsCtrl, createDepartmentCtrl, updateDepartmentCtrl, deleteDepartmentCtrl, getDepartmentCtrl, getDepartmentsStatisticsCtrl, getRecentDepartmentsCtrl } = require("../controllers/companyCoordinatorCtrl");
+const { getDepartmentsCtrl, createDepartmentCtrl, updateDepartmentCtrl, deleteDepartmentCtrl, getDepartmentCtrl, getDepartmentsStatisticsCtrl, getRecentDepartmentsCtrl } = require("../controllers/companyDepartemtCtrl");
 const isLogin = require("../middlewares/isLogin");
 const isCompanyCoordinator = require("../middlewares/isCompanyCoordinator");
 

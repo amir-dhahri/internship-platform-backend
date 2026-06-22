@@ -9,6 +9,7 @@ const CompanyCoordinator = require("../models/CompanyCoordinator");
 //@route POST /api/v1/departments/company
 //@access Private Company Coordinator Only
 exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
+    
     const {
         name,
         description,
