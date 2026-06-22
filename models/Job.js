@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 const { Schema } = mongoose;
 
-const internshipSchema = new Schema(
+const jobSchema = new Schema(
     {
         title: {
             type: String,
@@ -73,6 +73,6 @@ const internshipSchema = new Schema(
 
 //=====Model=====//
 
-const Internship = mongoose.model("Internship", internshipSchema);
+const Job = mongoose.model("Job", jobSchema);
 
-module.exports = Internship;
+module.exports = Job;

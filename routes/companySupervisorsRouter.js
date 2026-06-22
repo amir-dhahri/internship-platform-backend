@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isCompanySupervisor = require("../middlewares/isCompanySupervisor");
-const { updateInternshipCtrl, getInternshipCtrl, deleteInternshipCtrl, createInternshipsCtrl, sendMessage, getMessages, getDepartments, getCompanySupervisorsCtrl, fetchCompanySupervisorProfileCtrl, modifyCompanySupervisorProfileCtrl, loginCompanySupervisorCtrl, getCompanySupervisorCtrl, updateCompanySupervisorProfileCtrl, deleteCompanySupervisorCtrl, toggleAssignDepartmentsToSupervisorCtrl, registerCompanySupervisorCtrl, getInternshipsCtrl } = require("../controllers/companySupervisorCtrl");
+const { updateInternshipCtrl, getInternshipCtrl, deleteInternshipCtrl, createInternshipsCtrl, sendMessage, getMessages, getDepartments, getCompanySupervisorsCtrl, fetchCompanySupervisorProfileCtrl, modifyCompanySupervisorProfileCtrl, loginCompanySupervisorCtrl, getCompanySupervisorCtrl, updateCompanySupervisorProfileCtrl, deleteCompanySupervisorCtrl, toggleAssignDepartmentsToSupervisorCtrl, registerCompanySupervisorCtrl, getInternshipsCtrl, updateJobCtrl, getJobCtrl, deleteJobCtrl, getJobsCtrl, createJobsCtrl, updateTrainingCtrl, getTrainingCtrl, getTrainingsCtrl, createTrainingsCtrl, deleteTrainingCtrl } = require("../controllers/companySupervisorCtrl");
 const isCompanyCoordinator = require("../middlewares/isCompanyCoordinator");
 const { logoutCtrl, getNotificationsCtrl } = require("../controllers/companyCoordinatorCtrl");
 
@@ -11,6 +11,36 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const companySupervisorRouter = express.Router();
 
+
+//Update Training 
+companySupervisorRouter.put("/trainings/update/:id", isLogin, isCompanySupervisor, upload.single("file"), updateTrainingCtrl)
+
+//Get Training
+companySupervisorRouter.get("/trainings/get/single/:id", isLogin, isCompanySupervisor, getTrainingCtrl);
+
+//Delete Training
+companySupervisorRouter.delete("/trainings/delete/:id", isLogin, isCompanySupervisor, deleteTrainingCtrl);
+
+//Get Trainings
+companySupervisorRouter.get("/trainings/get", isLogin, isCompanySupervisor, getTrainingsCtrl)
+
+// Add Training
+companySupervisorRouter.post("/trainings/add", isLogin, isCompanySupervisor, upload.single("file"), createTrainingsCtrl);
+
+//Update Job 
+companySupervisorRouter.put("/jobs/update/:id", isLogin, isCompanySupervisor, upload.single("file"), updateJobCtrl)
+
+//Get Job
+companySupervisorRouter.get("/jobs/get/single/:id", isLogin, isCompanySupervisor, getJobCtrl);
+
+//Delete Job
+companySupervisorRouter.delete("/jobs/delete/:id", isLogin, isCompanySupervisor, deleteJobCtrl);
+
+//Get jobs
+companySupervisorRouter.get("/jobs/get", isLogin, isCompanySupervisor, getJobsCtrl)
+
+// Add Job
+companySupervisorRouter.post("/jobs/add", isLogin, isCompanySupervisor, upload.single("file"), createJobsCtrl);
 
 //Update Internship 
 companySupervisorRouter.put("/internships/update/:id", isLogin, isCompanySupervisor, upload.single("file"), updateInternshipCtrl)
