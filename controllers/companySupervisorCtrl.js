@@ -132,7 +132,7 @@ exports.updateCompanySupervisorProfileCtrl = AsyncHandler(async (req, res) => {
     } = req.body;
     const { id } = req.params;
 
-    const companySupervisorFound = await companySupervisor.findOne({ email, _id: { $ne: id } });
+    const companySupervisorFound = await CompanySupervisor.findOne({ email, _id: { $ne: id } });
     if (companySupervisorFound) {
         throw new Error("company supervisor credentials already exist")
     }
@@ -143,7 +143,7 @@ exports.updateCompanySupervisorProfileCtrl = AsyncHandler(async (req, res) => {
         photo = await uploadImage(file);
     }
 
-    const companySupervisor = await companySupervisor.findByIdAndUpdate(id, {
+    const companySupervisor = await CompanySupervisor.findByIdAndUpdate(id, {
         firstName,
         lastName,
         phone,
@@ -239,41 +239,42 @@ exports.deleteCompanySupervisorCtrl = AsyncHandler(async (req, res) => {
 //@access Private Company Coordinator Only
 exports.toggleAssignDepartmentsToSupervisorCtrl = AsyncHandler(async (req, res) => {
     const { id: supervisorId } = req.params;
-    const { departmentId } = req.body;
+    const { departmentID } = req.body;
     const companySupervisor = await CompanySupervisor.findById(supervisorId);
     if (!companySupervisor) {
         throw new Error("Company spervisor not found");
     }
-    const departement = await Department.findById(departmentId);
+    const departement = await Department.findById(departmentID);
     if (!departement) {
         throw new Error("Department not found");
     }
     const exists = companySupervisor.departments.some(
-        (id) => id.toString() === departmentId
+        (id) => id.toString() === departmentID
     );
-
+    
     if (exists) {
         companySupervisor.departments = companySupervisor.departments.filter(
-            (id) => id.toString() !== departmentId
+            (id) => id.toString() !== departmentID
         );
     } else {
-        companySupervisor.departments.push(departmentId);
+        companySupervisor.departments.push(departmentID);
     }
-
+    
     await companySupervisor.save();
-
+    
     const name = `${companySupervisor.firstName} ${companySupervisor.lastName}`
-
+    
     const message = exists
-        ? `Company supervisor "${name}" was unassigned from company year "${companyYear.name}".`
-        : `Company supervisor "${name}" was assigned a new company year "${companyYear.name}".`;
-
+    ? `L’encadrant d’entreprise "${name}" a été désassigné de département "${departement.name}".".`
+    : `L’encadrant d’entreprise "${name}" a été affecté à un nouveau département "${departement.name}".`;
+    
     const { id: userId } = req.userAuth;
-
+    
+    console.log("departmentId", departmentID);
     const companyCoordinator = await CompanyCoordinator.findById(userId);
-
+    
     const receivers = [userId]
-
+    
     const notif = await Notification.create({
         sender: userId,
         receivers,

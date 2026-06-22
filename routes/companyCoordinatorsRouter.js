@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { registerCompanyCtrl, getCompanyCtrl, registerCompanyCoordinatorCtrl, loginCompanyCoordinatorCtrl, getCompanyCoordinatorProfileCtrl, updateAcademicCoordinatorProfileCtrl, createNotificationCtrl, getNotificationsCtrl, logoutCtrl, updateCompanyCoordinatorProfileCtrl } = require("../controllers/companyCoordinatorCtrl");
+const { registerCompanyCtrl, getCompanyCtrl, registerCompanyCoordinatorCtrl, loginCompanyCoordinatorCtrl, getCompanyCoordinatorProfileCtrl, updateAcademicCoordinatorProfileCtrl, createNotificationCtrl, getNotificationsCtrl, logoutCtrl, updateCompanyCoordinatorProfileCtrl, getDepartmentsCtrl } = require("../controllers/companyCoordinatorCtrl");
 const isLogin = require("../middlewares/isLogin");
 const isCompanyCoordinator = require("../middlewares/isCompanyCoordinator");
 
@@ -32,6 +32,9 @@ companyCoordinatorRouter.get("/notifications", isLogin, isCompanyCoordinator, ge
 
 // Company Coordinator Log out
 companyCoordinatorRouter.post("/logout", isLogin, isCompanyCoordinator, logoutCtrl);
+
+// Get Company Coordinator Departments
+companyCoordinatorRouter.get("/departments", isLogin, isCompanyCoordinator, getDepartmentsCtrl);
 
 module.exports = companyCoordinatorRouter;
 

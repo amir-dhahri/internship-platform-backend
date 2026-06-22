@@ -5,6 +5,7 @@ const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
 const { default: Notification } = require("../models/Notification");
 const CompanyCoordinator = require("../models/CompanyCoordinator");
+const Department = require("../models/Department");
 
 
 //@desc Register company coordinator
@@ -285,3 +286,19 @@ exports.logoutCtrl = AsyncHandler(async (req, res) => {
         message: "Logged out successfully"
     });
 });
+
+//@desc Get all departments
+//@route GET /api/v1/company-coordinators/departments
+//@access Private Company Coordinator Only
+exports.getDepartmentsCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const company = await Company.findOne({ companyCoordinator: id });
+    const departments = await Department.find({ company: company._id });
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Departments fetched successfully",
+            data: departments,
+        }
+    );
+})
