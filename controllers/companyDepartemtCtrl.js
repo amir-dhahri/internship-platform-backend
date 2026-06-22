@@ -9,6 +9,7 @@ const CompanyCoordinator = require("../models/CompanyCoordinator");
 //@route POST /api/v1/departments/company
 //@access Private Company Coordinator Only
 exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
+    
     const {
         name,
         description,
@@ -18,7 +19,7 @@ exports.createDepartmentCtrl = AsyncHandler(async (req, res) => {
     const company = await Company.findOne({ companyCoordinator: id });
     const departmentFound = await Department.findOne({ name, company: company._id });
     if (departmentFound) {
-        throw new Error("Department already exists");
+        throw new Error("Company department already exists");
     }
     const department = await Department.create(
         {
