@@ -30,6 +30,7 @@ app.use(cors({
 
 // app.use("api/v1/admins", adminRouter);
 // app.use("api/v1/students", studentRouter);
+app.use("/api/v1/departments/company", companyDepartmentRouter)
 app.use("/api/v1/departments", departmentRouter);
 app.use("/api/v1/academic-levels", acdemicLevelRouter)
 app.use("/api/v1/academic-coordinators", academicCoordinatorRouter)
@@ -38,7 +39,6 @@ app.use("/api/v1/academic-supervisors", academicSupervisorsRouter)
 app.use("/api/v1/students", studentRouter)
 app.use("/api/v1/company-coordinators", companyCoordinatorRouter);
 app.use("/api/v1/company-supervisors", companySupervisorRouter);
-app.use("/api/v1/departments/company", companyDepartmentRouter)
 //=====Error Middlewares=====//
 app.use(notFoundError);
 app.use(globalErrHandler);
