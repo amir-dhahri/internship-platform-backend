@@ -95,6 +95,22 @@ exports.getAcademicSupervisorCtrl = AsyncHandler(async (req, res) => {
     });
 })
 
+//@desc Get academic supervisor
+//@route GET /api/v1/academic-supervisors/single
+//@access Private University Coordinator Only
+exports.getAcademicSupervisorSingleCtrl = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const academicSupervisor = await AcademicSupervisor.findById(id);
+    if (!academicSupervisor) {
+        throw new Error("Academic superivor Not Found!");
+    }
+    res.status(200).json({
+        status: "success",
+        message: "Academic superivor fetched successfully",
+        data: academicSupervisor,
+    });
+})
+
 //@desc Get academic supervisor profile
 //@route GET /api/v1/academic-supervisors/:id/profile
 //@access Private University Coordinators 
