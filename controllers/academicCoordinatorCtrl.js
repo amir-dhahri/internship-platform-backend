@@ -17,12 +17,12 @@ exports.registerAcademicCoordinatorCtrl = AsyncHandler(async (req, res) => {
         email,
         password,
     } = req.body;
-
     
     const academicCoordinatorFound = await AcademicCoordinator.findOne({ email });
     if (academicCoordinatorFound) {
         throw new Error("Academic coordinator already exists");
     }
+    
     const firstName = name.split(" ")[0];
     const lastName = name.split(" ")[1];
     const academicCoordinator = await AcademicCoordinator.create(
