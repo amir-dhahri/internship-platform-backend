@@ -797,10 +797,12 @@ exports.createJobsCtrl = AsyncHandler(async (req, res) => {
         workMode,
         poste,
         requirementsStr,
-        status,
         type
     } = req.body;
-
+    console.log(requirementsStr);
+    console.log(workMode);
+    console.log(type);
+    
     const { id } = req.userAuth;
     const jobFound = await Job.findOne({ title, companySupervisor: id });
     if (jobFound) {
@@ -832,7 +834,6 @@ exports.createJobsCtrl = AsyncHandler(async (req, res) => {
             workMode,
             poste,
             requirements: requirementsStr ? JSON.parse(requirementsStr) : [],
-            status,
             type,
             image: imgURL,
             companySupervisor: id
@@ -1015,7 +1016,7 @@ exports.createTrainingsCtrl = AsyncHandler(async (req, res) => {
         sujet,
         requirementsStr,
         status,
-        type
+        type,
     } = req.body;
 
     const { id } = req.userAuth;

@@ -33,8 +33,8 @@ const trainingSchema = new Schema(
         },
         workMode: {
             type: String,
-            enum: ["onsite", "remote", "hybrid"],
-            default: "onsite"
+            enum: ["Présentiel", "Hybride", "À distance"],
+            default: "Présentiel"
         },
         student: {
             type: Schema.Types.ObjectId,
@@ -52,28 +52,28 @@ const trainingSchema = new Schema(
         requirements: [{
             type: String,
             enum: [
-                "student",
-                "basic_knowledge",
-                "motivation",
-                "laptop",
-                "internet",
-                "cv",
-                "project",
-                "availability",
-                "teamwork",
-                "communication",
+                "Être étudiant(e) ou apprenant(e)",
+                "Connaissances de base dans le domaine",
+                "Motivation et engagement",
+                "Avoir un ordinateur portable",
+                "Connexion Internet (si formation en ligne)",
+                "CV à jour",
+                "Avoir réalisé des projets personnels ou académiques",
+                "Disponibilité pendant toute la durée de la formation",
+                "Esprit d’équipe",
+                "Bonnes compétences en communication",
             ]
         }],
         status: {
             type: String,
-            enum: ["pending", "approved", "ongoing", "completed", "rejected"],
-            default: "pending",
+            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
+            default: "en attente",
             required: true,
         },
         type: {
             type: String,
-            enum: ["bootcamp", "training", "workshop", "certification", "online"],
-            default: "bootcamp",
+            enum: ["Bootcamp", "Formation", "Atelier", "Certification", "Formation en ligne"],
+            default: "Bootcamp",
             required: true,
         },
     },

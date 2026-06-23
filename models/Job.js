@@ -33,8 +33,8 @@ const jobSchema = new Schema(
         },
         workMode: {
             type: String,
-            enum: ["onsite", "remote", "hybrid", "freelance", "part-time-onsite"],
-            default: "onsite"
+            enum: ["Présentiel", "Télétravail", "Hybride (présentiel + télétravail)", "Freelance / Remote", "Temps partiel en présentiel"],
+            default: "Présentiel"
         },
         student: {
             type: Schema.Types.ObjectId,
@@ -51,18 +51,18 @@ const jobSchema = new Schema(
         },
         requirements: [{
             type: String,
-            enum: ["diploma", "experience", "internship_experience", "teamwork", "autonomy", "communication", "technical_skills", "languages", "problem_solving", "portfolio"],
+            enum: ["Diplôme requis", "Expérience professionnelle", "Stage ou projet académique", "Travail en équipe", "Autonomie", "Bonnes compétences en communication", "Compétences techniques spécifiques", "Maîtrise des langues", "Résolution de problèmes", "Portfolio / projets requis"],
         }],
         status: {
             type: String,
-            enum: ["pending", "approved", "ongoing", "completed", "rejected"],
-            default: "pending",
+            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
+            default: "en attente",
             required: true,
         },
         type: {
             type: String,
-            enum: ["cdi", "cdd", "stage", "alternance", "freelance", "saisonnier", "temps-partiel"],
-            default: "cdi",
+            enum: ["CDI", "CDD", "stage", "alternance", "freelance", "saisonnier", "temps-partiel"],
+            default: "CDI",
             required: true,
         },
     },

@@ -33,8 +33,8 @@ const internshipSchema = new Schema(
         },
         workMode: {
             type: String,
-            enum: ["onsite", "remote", "hybrid"],
-            default: "onsite"
+            enum: ["Présentiel", "Hybride", "À distance"],
+            default: "Présentiel"
         },
         student: {
             type: Schema.Types.ObjectId,
@@ -56,27 +56,27 @@ const internshipSchema = new Schema(
         },
         requirements: [{
             type: String,
-            enum: ["student",
-                "degree",
-                "cv",
-                "cover_letter",
-                "project",
-                "portfolio",
-                "web_skills",
-                "teamwork",
-                "communication",
-                "availability",]
+            enum: ["Être étudiant(e)",
+                "Diplôme en cours (informatique ou domaine similaire)",
+                "CV obligatoire",
+                "Lettre de motivation",
+                "Avoir réalisé des projets académiques",
+                "Portfolio (GitHub ou projets personnels)",
+                "Connaissances en développement web",
+                "Travail en équipe",
+                "Bonnes compétences en communication",
+                "Disponibilité pour la durée du stage",]
         }],
         status: {
             type: String,
-            enum: ["pending", "approved", "ongoing", "completed", "rejected"],
-            default: "pending",
+            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
+            default: "en attente",
             required: true,
         },
         type: {
             type: String,
-            enum: ["summer", "end-of-study", "part-time"],
-            default: "end-of-study",
+            enum: ["Stage d'été", "Stage de fin d'études", "Temps partiel"],
+            default: "Stage de fin d'études",
             required: true,
         },
     },
