@@ -24,7 +24,7 @@ const isLogin = async (req, res, next) => {
             return next(new Error("Token expired/invalid"));
         }
 
-        req.userAuth = { id: verifiedToken.id };
+        req.userAuth = { id: verifiedToken.id , role: verifiedToken.role};
 
         next();
     } catch (error) {

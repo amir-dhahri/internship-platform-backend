@@ -11,7 +11,6 @@ const AcademicSupervisor = require("../models/AcademicSupervisor");
 //@desc Register student
 //@route POST /api/v1/students/
 //@access Private Academic Supervisors Only
-
 exports.registerStudentCtrl = AsyncHandler(async (req, res) => {
     const {
         firstName,

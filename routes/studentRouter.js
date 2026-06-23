@@ -3,6 +3,7 @@ const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
 const { getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl } = require("../controllers/studentCtrl");
+const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -19,19 +20,19 @@ studentRouter.post("/", isLogin, isAcademicSupervisor, registerStudentCtrl);
 studentRouter.get("/", isLogin, isAcademicSupervisor, getStudentsCtrl);
 
 // Get Student Profile
-studentRouter.get("/fetch/profile", isLogin, isAcademicSupervisor, fetchStudentProfileCtrl);
+studentRouter.get("/fetch/profile", isLogin, isStudent, fetchStudentProfileCtrl);
 
 // Update Student Profile
-studentRouter.put("/modify/profile", isLogin, isAcademicSupervisor, upload.single("file"), modifyStudentProfileCtrl);
+studentRouter.put("/modify/profile", isLogin, isStudent, upload.single("file"), modifyStudentProfileCtrl);
 
 // Login Student
 studentRouter.post("/login", loginStudentCtrl);
 
-// Login Student
-studentRouter.post("/logout", isLogin, isAcademicSupervisor, logoutCtrl);
+// logout Student
+studentRouter.post("/logout", isLogin, isStudent, logoutCtrl);
 
 // Login Student
-studentRouter.get("/notifications", isLogin, isAcademicSupervisor, getNotificationsCtrl);
+studentRouter.get("/notifications", isLogin, isStudent, getNotificationsCtrl);
 
 // Get Student Profile
 studentRouter.get("/:id/profile", isLogin, isAcademicSupervisor, getStudentProfileCtrl);
