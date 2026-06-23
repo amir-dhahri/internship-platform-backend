@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships } = require("../controllers/studentCtrl");
+const {getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications } = require("../controllers/studentCtrl");
 const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,6 +10,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const studentRouter = express.Router();
 
+
+
+//Get job Applications 
+studentRouter.get("/job-applications", isLogin, isStudent, getJobApplications);
+
+//Get internship Applications 
+studentRouter.get("/internship-applications", isLogin, isStudent, getInternshipApplications);
 
 // Get Internships 
 studentRouter.get("/internships", isLogin, isStudent, getInternships);

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const internshipApplicationSchema = new mongoose.Schema(
+const jobApplicationSchema = new mongoose.Schema(
     {
         student: {
             type: mongoose.Schema.Types.ObjectId,
@@ -8,22 +8,15 @@ const internshipApplicationSchema = new mongoose.Schema(
             required: true,
         },
 
-        internship: {
+        job: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Internship",
+            ref: "Job",
             required: true,
         },
         cv: {
             url: String,
             public_id: String,
         },
-
-        academicSupervisor: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "AcademicSupervisor",
-            default: null,
-        },
-
         companySupervisor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "CompanySupervisor",
@@ -39,6 +32,6 @@ const internshipApplicationSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const InternshipApplication = mongoose.model("InternshipApplication", internshipApplicationSchema);
+const JobApplication = mongoose.model("JobApplication", jobApplicationSchema);
 
-module.exports = InternshipApplication;
+module.exports = JobApplication;

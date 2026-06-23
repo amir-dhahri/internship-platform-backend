@@ -1,19 +1,19 @@
-const InternshipApplication = require("../models/InternshipApplication");
 const Student = require("../models/Student");
 const AsyncHandler = require("express-async-handler");
 const { default: Notification } = require("../models/Notification");
-const Internship = require("../models/Internship");
 const { uploadPdf } = require("../utils/cloudinary");
+const JobApplication = require("../models/jobApplication");
+const Job = require("../models/Job");
 
-//@desc Apply to an internship
-//@route POST /api/v1/internship-applications/:id
+//@desc Apply to an job
+//@route POST /api/v1/job-applications/:id
 //@access Private Students Only
-exports.applyToInternship = AsyncHandler(async (req, res) => {
+exports.applyToJob = AsyncHandler(async (req, res) => {
     const studentId = req.userAuth.id;
-    const internshipId = req.params.id;
-    const existing = await InternshipApplication.findOne({
+    const jobId = req.params.id;
+    const existing = await JobApplication.findOne({
         student: studentId,
-        internship: internshipId,
+        job: jobId,
     });
     
     if (existing) {
@@ -27,14 +27,13 @@ exports.applyToInternship = AsyncHandler(async (req, res) => {
         cv = await uploadPdf(req.file);
     }
     const student = await Student.findById(studentId);
-    const internship = await Internship.findById(internshipId);
+    const job = await Job.findById(jobId);
     
-    const application = await InternshipApplication.create({
+    const application = await JobApplication.create({
         student: studentId,
-        internship: internshipId,
+        job: jobId,
         cv,
-        academicSupervisor: student.academicSupervisorId,
-        companySupervisor: internship.companySupervisor ? internship.companySupervisor : null
+        companySupervisor: job.companySupervisor
     });
 
     const receivers = [studentId]
@@ -43,9 +42,9 @@ exports.applyToInternship = AsyncHandler(async (req, res) => {
         sender: studentId,
         receivers,
         type: "SYSTEM",
-        entity: internship.title,
-        entityType: "Stages",
-        message: `Vous avez postulé au stage "${internship.title}"`,
+        entity: job.title,
+        entityType: "Offres d'emploi",
+        message: `Vous avez postulé à l'offre d'emploi "${job.title}"`,
         isRead: false,
         senderPhoto: student.photo
     });

@@ -8,6 +8,8 @@ const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
 const Internship = require("../models/Internship");
+const InternshipApplication = require("../models/InternshipApplication");
+const JobApplication = require("../models/jobApplication");
 
 //@desc Register student
 //@route POST /api/v1/students/
@@ -569,3 +571,28 @@ exports.getInternship = AsyncHandler(async (req, res) => {
     });
 });
 
+//@desc Get Internship Applications
+//@route GET /api/v1/students/internship-application
+//@access Private Student Only
+exports.getInternshipApplications = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const internshipApplications = await InternshipApplication.find({student: id}).populate("internship");
+    res.status(200).json({
+        status: "success",
+        message: "Internship applications fetched successfully",
+        data: internshipApplications
+    });
+});
+
+//@desc Get job Applications
+//@route GET /api/v1/students/job-applications
+//@access Private Student Only
+exports.getJobApplications = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const jobApplications = await JobApplication.find({student: id}).populate("job");
+    res.status(200).json({
+        status: "success",
+        message: "Job applications fetched successfully",
+        data: jobApplications
+    });
+});
