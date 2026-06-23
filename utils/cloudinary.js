@@ -28,3 +28,18 @@ export async function uploadImage(file) {
     });
     return result.secure_url;
 }
+
+export async function uploadPdf(file) {
+    const base64Data = file.buffer.toString("base64");
+    const fileUri = `data:${file.mimetype};base64,${base64Data}`;
+
+    const result = await cloudinary.uploader.upload(fileUri, {
+        folder: "university/cvs",
+        resource_type: "raw", 
+    });
+
+    return {
+        url: result.secure_url,
+        public_id: result.public_id,
+    };
+}

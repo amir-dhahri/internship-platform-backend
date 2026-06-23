@@ -13,6 +13,10 @@ const internshipApplicationSchema = new mongoose.Schema(
             ref: "Internship",
             required: true,
         },
+        cv: {
+            url: String,
+            public_id: String,
+        },
 
         academicSupervisor: {
             type: mongoose.Schema.Types.ObjectId,

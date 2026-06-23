@@ -9,7 +9,6 @@ const Internship = require("../models/Internship");
 exports.applyToInternship = AsyncHandler(async (req, res) => {
     const studentId = req.userAuth.id;
     const internshipId = req.params.id;
-    const { companySupervisorID } = req.body;
     const existing = await InternshipApplication.findOne({
         student: studentId,
         internship: internshipId,
@@ -21,14 +20,20 @@ exports.applyToInternship = AsyncHandler(async (req, res) => {
             message: "Already applied",
         });
     }
+    let cv = null;
+
+    if (req.file) {
+        cv = await uploadPdf(req.file);
+    }
     const student = await Student.findById(studentId);
     const internship = await Internship.findById(internshipId);
 
     const application = await InternshipApplication.create({
         student: studentId,
         internship: internshipId,
+        cv,
         academicSupervisor: student.academicSupervisorId,
-        companySupervisor: companySupervisorID ? companySupervisorID : null
+        companySupervisor: internship.companySupervisor ? internship.companySupervisor : null
     });
 
     const receivers = [studentId]
