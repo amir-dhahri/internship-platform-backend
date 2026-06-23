@@ -10,6 +10,9 @@ const AcademicSupervisor = require("../models/AcademicSupervisor");
 const Internship = require("../models/Internship");
 const InternshipApplication = require("../models/InternshipApplication");
 const JobApplication = require("../models/jobApplication");
+const Job = require("../models/Job");
+const Training = require("../models/Training");
+const TrainingApplication = require("../models/trainingApplication");
 
 //@desc Register student
 //@route POST /api/v1/students/
@@ -571,6 +574,56 @@ exports.getInternship = AsyncHandler(async (req, res) => {
     });
 });
 
+//@desc Get Jobs
+//@route GET /api/v1/students/jobs
+//@access Private Student Only
+exports.getJobs = AsyncHandler(async (req, res) => {
+    const jobs = await Job.find();
+    res.status(200).json({
+        status: "success",
+        message: "Jobs fetched successfully",
+        data: jobs
+    });
+});
+
+//@desc Get Job
+//@route GET /api/v1/students/jobs/:id
+//@access Private Student Only
+exports.getJob = AsyncHandler(async (req, res) => {
+    const {id} = req.params;
+    const job = await Job.findById(id);
+    res.status(200).json({
+        status: "success",
+        message: "Job fetched successfully",
+        data: job
+    });
+});
+
+//@desc Get Trainings
+//@route GET /api/v1/students/trainings
+//@access Private Student Only
+exports.getTrainings = AsyncHandler(async (req, res) => {
+    const trainings = await Training.find();
+    res.status(200).json({
+        status: "success",
+        message: "Trainings fetched successfully",
+        data: trainings
+    });
+});
+
+//@desc Get Training
+//@route GET /api/v1/students/trainings/:id
+//@access Private Student Only
+exports.getTraining = AsyncHandler(async (req, res) => {
+    const {id} = req.params;
+    const training = await Training.findById(id);
+    res.status(200).json({
+        status: "success",
+        message: "Training fetched successfully",
+        data: training
+    });
+});
+
 //@desc Get Internship Applications
 //@route GET /api/v1/students/internship-application
 //@access Private Student Only
@@ -594,5 +647,19 @@ exports.getJobApplications = AsyncHandler(async (req, res) => {
         status: "success",
         message: "Job applications fetched successfully",
         data: jobApplications
+    });
+});
+
+
+//@desc Get Training Applications
+//@route GET /api/v1/students/Training-applications
+//@access Private Student Only
+exports.getTrainingApplications = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const trainingApplications = await TrainingApplication.find({student: id}).populate("training");
+    res.status(200).json({
+        status: "success",
+        message: "Training applications fetched successfully",
+        data: trainingApplications
     });
 });
