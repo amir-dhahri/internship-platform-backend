@@ -64,12 +64,6 @@ const trainingSchema = new Schema(
                 "Bonnes compétences en communication",
             ]
         }],
-        status: {
-            type: String,
-            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
-            default: "en attente",
-            required: true,
-        },
         type: {
             type: String,
             enum: ["Bootcamp", "Formation", "Atelier", "Certification", "Formation en ligne"],

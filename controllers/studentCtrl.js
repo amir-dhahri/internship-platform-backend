@@ -7,6 +7,7 @@ const { hashPassword, isPassMatched } = require("../utils/helpers");
 const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
 const AcademicSupervisor = require("../models/AcademicSupervisor");
+const Internship = require("../models/Internship");
 
 //@desc Register student
 //@route POST /api/v1/students/
@@ -525,3 +526,46 @@ exports.getAcademicYearStudentCtrl = AsyncHandler(async (req, res) => {
         data: students
     })
 })
+
+//@desc Get Internships
+//@route GET /api/v1/students/internships
+//@access Private Student Only
+exports.getInternships = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+
+    const student = await Student.findById(id);
+
+    const internships = [];
+
+    internships.push(
+        ...(await Internship.find({
+            academicSupervisor: student.academicSupervisorId
+        }))
+    );
+
+    internships.push(
+        ...(await Internship.find({
+            academicSupervisor: { $exists: false }
+        }))
+    );
+
+    res.status(200).json({
+        status: "success",
+        message: "Internships fetched successfully",
+        data: internships
+    });
+});
+
+//@desc Get Internship
+//@route GET /api/v1/students/internships/:id
+//@access Private Student Only
+exports.getInternship = AsyncHandler(async (req, res) => {
+    const {id} = req.params;
+    const internship = await Internship.findById(id);
+    res.status(200).json({
+        status: "success",
+        message: "Internship fetched successfully",
+        data: internship
+    });
+});
+

@@ -53,12 +53,6 @@ const jobSchema = new Schema(
             type: String,
             enum: ["Diplôme requis", "Expérience professionnelle", "Stage ou projet académique", "Travail en équipe", "Autonomie", "Bonnes compétences en communication", "Compétences techniques spécifiques", "Maîtrise des langues", "Résolution de problèmes", "Portfolio / projets requis"],
         }],
-        status: {
-            type: String,
-            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
-            default: "en attente",
-            required: true,
-        },
         type: {
             type: String,
             enum: ["CDI", "CDD", "stage", "alternance", "freelance", "saisonnier", "temps-partiel"],

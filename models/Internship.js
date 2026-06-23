@@ -67,12 +67,6 @@ const internshipSchema = new Schema(
                 "Bonnes compétences en communication",
                 "Disponibilité pour la durée du stage",]
         }],
-        status: {
-            type: String,
-            enum: ["en attente", "approuvé", "en cours", "terminé", "rejeté"],
-            default: "en attente",
-            required: true,
-        },
         type: {
             type: String,
             enum: ["Stage d'été", "Stage de fin d'études", "Temps partiel"],

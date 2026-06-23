@@ -2,13 +2,20 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl } = require("../controllers/studentCtrl");
+const { getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships } = require("../controllers/studentCtrl");
 const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const studentRouter = express.Router();
+
+
+// Get Internships 
+studentRouter.get("/internships", isLogin, isStudent, getInternships);
+
+// Get Internship 
+studentRouter.get("/internships/:id", isLogin, isStudent, getInternship);
 
 // Get Student Departments
 studentRouter.get("/departments", isLogin, isAcademicSupervisor, getDepartments);
@@ -51,5 +58,6 @@ studentRouter.delete("/:id", isLogin, isAcademicSupervisor, deleteStudentCtrl);
 
 // Get Academic Year students
 studentRouter.get("/academic-years/:id", isLogin, isAcademicSupervisor, getAcademicYearStudentCtrl);
+
 
 module.exports = studentRouter;
