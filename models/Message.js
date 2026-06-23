@@ -20,17 +20,12 @@ const messageSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        attachments: [
-            {
-                url: String,
-            },
-        ],
-        readBy: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
+        type: {
+            type: String,
+            required: true,
+            enum: ["text", "image"],
+            default: "text"
+        },
     },
     {
         timestamps: true,

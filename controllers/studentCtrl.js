@@ -1,6 +1,6 @@
 const AsyncHandler = require("express-async-handler");
 const { default: Notification } = require("../models/Notification");
-const AcademicCoordinator = require("../models/AcademicCoordinator");
+const Message = require("../models/Message");
 const Student = require("../models/Student");
 const AcademicYear = require("../models/AcademicYear");
 const { hashPassword, isPassMatched } = require("../utils/helpers");
@@ -81,6 +81,22 @@ exports.getStudentsCtrl = AsyncHandler(async (req, res) => {
         }
     );
 })
+
+//@desc Get all student
+//@route GET /api/v1/students/single
+//@access Private Academic Supervisor Only
+exports.getStudentSingleCtrl = AsyncHandler(async (req, res) => {
+    const {id} = req.userAuth;
+    const student = await Student.findById(id).select("-password");
+    res.status(200).json(
+        {
+            status: "success",
+            message: "Student fetched successfully",
+            data: student,
+        }
+    );
+})
+
 
 //@desc Get student
 //@route GET /api/v1/students/:id
@@ -661,5 +677,57 @@ exports.getTrainingApplications = AsyncHandler(async (req, res) => {
         status: "success",
         message: "Training applications fetched successfully",
         data: trainingApplications
+    });
+});
+
+//@desc Student send message
+//@route POST /api/v1/academic-supervisors/chat/send
+//@access Private Student Only
+exports.sendMessage = AsyncHandler(async (req, res) => {
+    const { text, receiverId } = req.body;
+    const { id: senderId } = req.userAuth;
+    const files = req.files;
+    const attachments = [];
+
+    if (files) {
+        for (let file in files) {
+            const photo = await uploadImage(file);
+            attachments.push(photo);
+        }
+    }
+
+    const message = await Message.create({
+        receiverId,
+        senderId,
+        text,
+        attachments
+    });
+
+    const io = req.app.get("io");
+
+    io.to(receiverId.toString()).emit("receive_message", message);
+
+    res.status(200).json({
+        status: "success",
+        message: "Message sent successfully",
+        data: message
+    })
+})
+
+//@desc Student Get Messages
+//@route POST /api/v1/academic-supervisors/chat/messages
+//@access Private Student Only
+exports.getMessages = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const messages = await Message.find({
+        $or: [
+            { senderId: id },
+            { receiverId: id }
+        ]
+    });
+    res.status(200).json({
+        status: "success",
+        message: "Messages fetched successfully",
+        data: messages
     });
 });

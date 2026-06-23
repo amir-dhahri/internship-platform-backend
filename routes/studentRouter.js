@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const {getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications } = require("../controllers/studentCtrl");
+const {getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications, sendMessage, getMessages, getStudentCtrl, getStudentSingleCtrl } = require("../controllers/studentCtrl");
 const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,7 +10,14 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const studentRouter = express.Router();
 
+// Get Student
+studentRouter.get("/single", isLogin, isStudent, getStudentSingleCtrl);
 
+// Send Message
+studentRouter.post("/chat/messages/send", isLogin, isStudent, sendMessage);
+
+// Get Messages
+studentRouter.get("/chat/messages", isLogin, isStudent, getMessages);
 
 // Get Trainings 
 studentRouter.get("/trainings", isLogin, isStudent, getTrainings);

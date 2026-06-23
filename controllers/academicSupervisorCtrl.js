@@ -536,23 +536,18 @@ exports.getStudents = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/chat/send
 //@access Private Academic Supervisor Only
 exports.sendMessage = AsyncHandler(async (req, res) => {
-    const { text, receiverId } = req.body;
+    const { text, receiverId, type} = req.body;
     const { id: senderId } = req.userAuth;
-    const files = req.files;
-    const attachments = [];
-
-    if (files) {
-        for (let file in files) {
-            const photo = await uploadImage(file);
-            attachments.push(photo);
-        }
+    const file = req.file;
+    if (type == "image") {
+        text = await uploadImage(file);
     }
 
     const message = await Message.create({
         receiverId,
         senderId,
         text,
-        attachments
+        type
     });
 
     const io = req.app.get("io");
@@ -566,19 +561,23 @@ exports.sendMessage = AsyncHandler(async (req, res) => {
     })
 })
 
-//@desc Academic Supervisor Get Messages
+//@desc Academic supervisor Get Messages
 //@route POST /api/v1/academic-supervisors/chat/messages
-//@access Private Academic Supervisor Only
+//@access Private Academic supervisor Only
 exports.getMessages = AsyncHandler(async (req, res) => {
-    const { receiverId } = req.body;
-    const { id: senderId } = req.userAuth;
-    const messages = await Message.find({ senderId, receiverId });
+    const { id } = req.userAuth;
+    const messages = await Message.find({
+        $or: [
+            { senderId: id },
+            { receiverId: id }
+        ]
+    });
     res.status(200).json({
         status: "success",
         message: "Messages fetched successfully",
         data: messages
-    })
-})
+    });
+});
 
 //@desc Add internship
 //@route POST /api/v1/internships
