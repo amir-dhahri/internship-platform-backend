@@ -686,27 +686,11 @@ exports.getTrainingApplications = AsyncHandler(async (req, res) => {
 exports.sendMessage = AsyncHandler(async (req, res) => {
     const { text, receiverId } = req.body;
     const { id: senderId } = req.userAuth;
-    const files = req.files;
-    const attachments = [];
-
-    if (files) {
-        for (let file in files) {
-            const photo = await uploadImage(file);
-            attachments.push(photo);
-        }
-    }
-
     const message = await Message.create({
         receiverId,
         senderId,
         text,
-        attachments
     });
-
-    const io = req.app.get("io");
-
-    io.to(receiverId.toString()).emit("receive_message", message);
-
     res.status(200).json({
         status: "success",
         message: "Message sent successfully",

@@ -5,7 +5,7 @@ const messageSchema = new mongoose.Schema(
         roomId: {
             type: String,
             required: false,
-            index: true, // for faster queries
+            index: true,
         },
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -19,12 +19,6 @@ const messageSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
-        },
-        type: {
-            type: String,
-            required: true,
-            enum: ["text", "image"],
-            default: "text"
         },
     },
     {
