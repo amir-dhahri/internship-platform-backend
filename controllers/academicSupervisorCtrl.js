@@ -553,7 +553,7 @@ exports.getStudents = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/chat/send
 //@access Private Academic Supervisor Only
 exports.sendMessage = AsyncHandler(async (req, res) => {
-    const { text, receiverId} = req.body;
+    const { text, receiverId } = req.body;
     const { id: senderId } = req.userAuth;
     const message = await Message.create({
         receiverId,
@@ -821,12 +821,13 @@ exports.getAcademicSupervisorStudentsCtrl = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/tasks/assign
 //@access Private Academic Supervisor Only
 exports.assignTask = AsyncHandler(async (req, res) => {
-    const { content, receiverId} = req.body;
+    const { content, receiverId,status } = req.body;
     const { id: senderId } = req.userAuth;
     const task = await Task.create({
         receiverId,
         senderId,
         content,
+        status
     });
     res.status(200).json({
         status: "success",
@@ -850,12 +851,12 @@ exports.getTasks = AsyncHandler(async (req, res) => {
 
 
 //@desc Academic supervisor Update Task
-//@route POST /api/v1/academic-supervisors/tasks/:id
+//@route POST /api/v1/academic-supervisors/tasks/update/:id
 //@access Private Academic supervisor Only
 exports.updateTaskStatus = AsyncHandler(async (req, res) => {
     const { id: taskId } = req.params;
     const { status } = req.body;
-    
+
     const task = await Task.findById(taskId);
 
     if (!task) {

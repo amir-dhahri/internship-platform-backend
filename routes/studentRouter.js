@@ -15,7 +15,7 @@ const studentRouter = express.Router();
 studentRouter.get("/tasks",  isLogin, isStudent, getTasks);
 
 // Update task status
-studentRouter.get("/tasks/:id",  isLogin, isStudent, updateTaskStatus);
+studentRouter.put("/tasks/update/:id",  isLogin, isAcademicSupervisor, updateTaskStatus);
 
 // Get Student
 studentRouter.get("/single", isLogin, isStudent, getStudentSingleCtrl);

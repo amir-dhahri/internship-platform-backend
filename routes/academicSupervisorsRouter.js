@@ -10,15 +10,14 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const academicSupervisorsRouter = express.Router();
 
+// Update task status
+academicSupervisorsRouter.put("/tasks/update/:id",  isLogin, isAcademicSupervisor, updateTaskStatus);
 
 // Asign task 
 academicSupervisorsRouter.post("/tasks/assign",  isLogin, isAcademicSupervisor, assignTask);
 
 // Get tasks
 academicSupervisorsRouter.get("/tasks",  isLogin, isAcademicSupervisor, getTasks);
-
-// Update task status
-academicSupervisorsRouter.get("/tasks/:id",  isLogin, isAcademicSupervisor, updateTaskStatus);
 
 // Get Academic Supervisor
 academicSupervisorsRouter.get("/single", isLogin, isAcademicSupervisor, getAcademicSupervisorSingleCtrl);

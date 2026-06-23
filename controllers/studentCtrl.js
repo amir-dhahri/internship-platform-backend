@@ -732,9 +732,11 @@ exports.getTasks = AsyncHandler(async (req, res) => {
 
 
 //@desc Student Update Task
-//@route POST /api/v1/academic-supervisors/tasks/:id
+//@route POST /api/v1/academic-supervisors/tasks/update/:id
 //@access Private Student Only
 exports.updateTaskStatus = AsyncHandler(async (req, res) => {
+  
+    
     const { id: taskId } = req.params;
     const { status } = req.body;
     
