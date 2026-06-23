@@ -13,6 +13,7 @@ const JobApplication = require("../models/jobApplication");
 const Job = require("../models/Job");
 const Training = require("../models/Training");
 const TrainingApplication = require("../models/trainingApplication");
+const Task = require("../models/task");
 
 //@desc Register student
 //@route POST /api/v1/students/
@@ -713,5 +714,44 @@ exports.getMessages = AsyncHandler(async (req, res) => {
         status: "success",
         message: "Messages fetched successfully",
         data: messages
+    });
+});
+
+//@desc Students Get Tasks
+//@route POST /api/v1/academic-supervisors/tasks
+//@access Private Students Only
+exports.getTasks = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const tasks = await Task.find({ receiverId: id });
+    res.status(200).json({
+        status: "success",
+        message: "Tasks fetched successfully",
+        data: tasks
+    });
+});
+
+
+//@desc Student Update Task
+//@route POST /api/v1/academic-supervisors/tasks/:id
+//@access Private Student Only
+exports.updateTaskStatus = AsyncHandler(async (req, res) => {
+    const { id: taskId } = req.params;
+    const { status } = req.body;
+    
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+        return res.status(404).json({
+            status: "fail",
+            message: "Task not found",
+        });
+    }
+    task.status = status;
+    await task.save();
+
+    res.status(200).json({
+        status: "success",
+        message: "Task status updated successfully",
+        data: task,
     });
 });

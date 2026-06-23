@@ -9,6 +9,7 @@ const { uploadImage } = require("../utils/cloudinary");
 const generateToken = require("../utils/generateToken");
 const Message = require("../models/Message");
 const Internship = require("../models/Internship");
+const Task = require("../models/task");
 
 //@desc Register academic supervisor
 //@route POST /api/v1/academic-supervisors/
@@ -815,3 +816,60 @@ exports.getAcademicSupervisorStudentsCtrl = AsyncHandler(async (req, res) => {
         data: students
     })
 })
+
+//@desc Academic Supervisor assign task
+//@route POST /api/v1/academic-supervisors/tasks/assign
+//@access Private Academic Supervisor Only
+exports.assignTask = AsyncHandler(async (req, res) => {
+    const { content, receiverId} = req.body;
+    const { id: senderId } = req.userAuth;
+    const task = await Task.create({
+        receiverId,
+        senderId,
+        content,
+    });
+    res.status(200).json({
+        status: "success",
+        message: "Task assigned successfully",
+        data: task
+    })
+})
+
+//@desc Academic supervisor Get Tasks
+//@route POST /api/v1/academic-supervisors/tasks
+//@access Private Academic supervisor Only
+exports.getTasks = AsyncHandler(async (req, res) => {
+    const { id } = req.userAuth;
+    const tasks = await Task.find({ senderId: id });
+    res.status(200).json({
+        status: "success",
+        message: "Tasks fetched successfully",
+        data: tasks
+    });
+});
+
+
+//@desc Academic supervisor Update Task
+//@route POST /api/v1/academic-supervisors/tasks/:id
+//@access Private Academic supervisor Only
+exports.updateTaskStatus = AsyncHandler(async (req, res) => {
+    const { id: taskId } = req.params;
+    const { status } = req.body;
+    
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+        return res.status(404).json({
+            status: "fail",
+            message: "Task not found",
+        });
+    }
+    task.status = status;
+    await task.save();
+
+    res.status(200).json({
+        status: "success",
+        message: "Task status updated successfully",
+        data: task,
+    });
+});

@@ -3,12 +3,22 @@ const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicCoordinator = require("../middlewares/isAcademicCoordinator");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl, updateInternshipCtrl, getAcademicSupervisorStudentsCtrl, getAcademicSupervisorSingleCtrl } = require("../controllers/academicSupervisorCtrl");
+const { registerAcademicSupervisorCtrl, getAcademicSupervisorCtrl, getAcademicSupervisorsCtrl, updateAcademicSupervisorProfileCtrl, deleteAcademicSupervisorCtrl, toggleAssignAcademicYearToSupervisorCtrl, loginAcademicSupervisorCtrl, fetchAcademicSupervisorProfileCtrl, modifyAcademicSupervisorProfileCtrl, getNotificationsCtrl, logoutCtrl, getDepartments, getStudents, sendMessage, getMessages, createInternshipsCtrl, getInternshipCtrl, deleteInternshipCtrl, getInternshipsCtrl, updateInternshipCtrl, getAcademicSupervisorStudentsCtrl, getAcademicSupervisorSingleCtrl, assignTask, getTasks, updateTaskStatus } = require("../controllers/academicSupervisorCtrl");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const academicSupervisorsRouter = express.Router();
+
+
+// Asign task 
+academicSupervisorsRouter.post("/tasks/assign",  isLogin, isAcademicSupervisor, assignTask);
+
+// Get tasks
+academicSupervisorsRouter.get("/tasks",  isLogin, isAcademicSupervisor, getTasks);
+
+// Update task status
+academicSupervisorsRouter.get("/tasks/:id",  isLogin, isAcademicSupervisor, updateTaskStatus);
 
 // Get Academic Supervisor
 academicSupervisorsRouter.get("/single", isLogin, isAcademicSupervisor, getAcademicSupervisorSingleCtrl);
