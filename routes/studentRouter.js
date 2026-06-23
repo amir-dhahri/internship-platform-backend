@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const {getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications, sendMessage, getMessages, getStudentCtrl, getStudentSingleCtrl, getTasks, updateTaskStatus } = require("../controllers/studentCtrl");
+const { getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications, sendMessage, getMessages, getStudentCtrl, getStudentSingleCtrl, getTasks, updateTaskStatus, assignTask } = require("../controllers/studentCtrl");
 const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -10,12 +10,14 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const studentRouter = express.Router();
 
+// Update task status
+studentRouter.put("/tasks/update/:id", isLogin, isStudent, updateTaskStatus);
+
+// Asign task 
+studentRouter.post("/tasks/assign", isLogin, isStudent, assignTask);
 
 // Get tasks
-studentRouter.get("/tasks",  isLogin, isStudent, getTasks);
-
-// Update task status
-studentRouter.put("/tasks/update/:id",  isLogin, isAcademicSupervisor, updateTaskStatus);
+studentRouter.get("/tasks", isLogin, isStudent, getTasks);
 
 // Get Student
 studentRouter.get("/single", isLogin, isStudent, getStudentSingleCtrl);

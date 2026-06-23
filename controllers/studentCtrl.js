@@ -717,6 +717,26 @@ exports.getMessages = AsyncHandler(async (req, res) => {
     });
 });
 
+//@desc Academic Supervisor assign task
+//@route POST /api/v1/academic-supervisors/tasks/assign
+//@access Private Academic Supervisor Only
+exports.assignTask = AsyncHandler(async (req, res) => {
+    const { content,status } = req.body;
+    const { id } = req.userAuth;
+    const task = await Task.create({
+        receiverId:id ,
+        senderId: id,
+        content,
+        status
+    });
+    res.status(200).json({
+        status: "success",
+        message: "Task assigned successfully",
+        data: task
+    })
+})
+
+
 //@desc Students Get Tasks
 //@route POST /api/v1/academic-supervisors/tasks
 //@access Private Students Only
@@ -735,8 +755,6 @@ exports.getTasks = AsyncHandler(async (req, res) => {
 //@route POST /api/v1/academic-supervisors/tasks/update/:id
 //@access Private Student Only
 exports.updateTaskStatus = AsyncHandler(async (req, res) => {
-  
-    
     const { id: taskId } = req.params;
     const { status } = req.body;
     
