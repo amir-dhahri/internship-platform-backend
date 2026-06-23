@@ -775,3 +775,16 @@ exports.updateTaskStatus = AsyncHandler(async (req, res) => {
         data: task,
     });
 });
+
+//@desc Student delete Task
+//@route POST /api/v1/academic-supervisors/tasks/delete/:id
+//@access Private Student Only
+exports.deleteTask = AsyncHandler(async (req, res) => {
+    const { id: taskId } = req.params;
+    const task = await Task.findByIdAndDelete(taskId);
+    res.status(200).json({
+        status: "success",
+        message: "Task deleted successfully",
+        data: task,
+    });
+});

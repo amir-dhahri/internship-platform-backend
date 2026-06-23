@@ -2,13 +2,17 @@ const express = require("express");
 const multer = require("multer");
 const isLogin = require("../middlewares/isLogin");
 const isAcademicSupervisor = require("../middlewares/isAcademicSupervisor");
-const { getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications, sendMessage, getMessages, getStudentCtrl, getStudentSingleCtrl, getTasks, updateTaskStatus, assignTask } = require("../controllers/studentCtrl");
+const { getJobs, getJobApplications, getInternship, getDepartments, getAcademicYearStudentCtrl, registerStudentCtrl, getStudentsCtrl, fetchStudentProfileCtrl, modifyStudentProfileCtrl, loginStudentCtrl, getStudentProfileCtrl, updateStudentProfileCtrl, deleteStudentCtrl, toggleAssignAcademicYearToStudentCtrl, logoutCtrl, getNotificationsCtrl, getInternships, getInternshipApplications, getJob, getTrainings, getTraining, getTrainingApplications, sendMessage, getMessages, getStudentCtrl, getStudentSingleCtrl, getTasks, updateTaskStatus, assignTask, deleteTaskStatus, deleteTask } = require("../controllers/studentCtrl");
 const isStudent = require("../middlewares/isStudent");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 
 const studentRouter = express.Router();
+
+
+//Delete Task 
+studentRouter.delete("/tasks/delete/:id", isLogin, isStudent, deleteTask)
 
 // Update task status
 studentRouter.put("/tasks/update/:id", isLogin, isStudent, updateTaskStatus);
