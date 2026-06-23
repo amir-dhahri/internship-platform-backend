@@ -3,17 +3,19 @@ const Student = require("../models/Student");
 const AsyncHandler = require("express-async-handler");
 const { default: Notification } = require("../models/Notification");
 const Internship = require("../models/Internship");
+const { uploadPdf } = require("../utils/cloudinary");
 //@desc Apply to an internship
 //@route POST /api/v1/internship-applications/:id
 //@access Private Students Only
 exports.applyToInternship = AsyncHandler(async (req, res) => {
+    
     const studentId = req.userAuth.id;
     const internshipId = req.params.id;
     const existing = await InternshipApplication.findOne({
         student: studentId,
         internship: internshipId,
     });
-
+    
     if (existing) {
         return res.status(400).json({
             status: "fail",
@@ -21,13 +23,12 @@ exports.applyToInternship = AsyncHandler(async (req, res) => {
         });
     }
     let cv = null;
-
     if (req.file) {
         cv = await uploadPdf(req.file);
     }
     const student = await Student.findById(studentId);
     const internship = await Internship.findById(internshipId);
-
+    
     const application = await InternshipApplication.create({
         student: studentId,
         internship: internshipId,
