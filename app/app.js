@@ -13,6 +13,7 @@ const studentRouter = require("../routes/studentRouter");
 const companyCoordinatorRouter = require("../routes/companyCoordinatorsRouter");
 const companySupervisorRouter = require("../routes/companySupervisorsRouter");
 const companyDepartmentRouter = require("../routes/companyDepartmentRouter");
+const internshipApplicationRouter = require("../routes/internshipApplicationRouter");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(cors({
 
 // app.use("api/v1/admins", adminRouter);
 // app.use("api/v1/students", studentRouter);
+app.use("/api/v1/internship-applications", internshipApplicationRouter)
 app.use("/api/v1/departments/company", companyDepartmentRouter)
 app.use("/api/v1/departments", departmentRouter);
 app.use("/api/v1/academic-levels", acdemicLevelRouter)
